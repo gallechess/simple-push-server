@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="10 seconds">
+
+    <property name="layoutPattern" value="%date %-5level [%class.%method:%line] - %message%n" />
+
+    <appender name="ConsoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${layoutPattern}</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="ConsoleAppender" />
+    </root>
+
+    <logger name="chess.push" level="DEBUG" additivity="false">
+        <appender-ref ref="ConsoleAppender" />
+    </logger>
+
+</configuration>
