@@ -1,2 +1,2 @@
 # simple-push-server
-Simple Push Server using WebSocket
+Simple Push Server using WebSocket and Netty
