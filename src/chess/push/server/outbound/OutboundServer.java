@@ -64,7 +64,7 @@ public class OutboundServer {
                                  pipeline.addLast(new DelimiterBasedFrameDecoder(Integer.MAX_VALUE, MessageUtil.MSG_DELIMITER));
                                  pipeline.addLast(new OutboundServerHandler(property));
                              } else if (property.getOutboundServerType() == ServerType.WEBSOCKET) {
-                                 // TODO
+                                 // TODO WebSocket 타입 서버 핸들러 설정
                              }
                          }
                      })

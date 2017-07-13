@@ -51,7 +51,7 @@ public class OutboundServerHandler extends SimpleChannelInboundHandler<Object> {
 
         LOG.info("[OutboundServer:{}] received {} from {}", property.getServiceId(), msgStr, ctx.channel());
 
-        // TODO
+        // TODO 클라이언트로부터 ID 수신 시 클라이언트 채널에 설정
     }
 
     /**

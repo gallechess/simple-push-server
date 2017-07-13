@@ -20,13 +20,22 @@ public class ServerMain {
 
     private static final Logger LOG = LoggerFactory.getLogger(ServerMain.class);
 
-    private Map<String, PushServiceProperty> serviceProps;	// PushServiceProperty collection (key: Service ID)
-    private Map<String, OutboundServer> outboundServers;	// OutboundServer collection (key: Service ID)
-    private Map<String, InboundQueue> inboundQueues;		// InboundQueue collection (key: Service ID)
+    private final Map<String, PushServiceProperty> serviceProps; // PushServiceProperty collection (key: Service ID)
+    private final Map<String, OutboundServer> outboundServers;   // OutboundServer collection (key: Service ID)
+    private final Map<String, InboundQueue> inboundQueues;       // InboundQueue collection (key: Service ID)
 
-//    private static OutboundQueueCounter outboundQueueCounterThread;
-//    private static InboundQueueCounter inboundQueueCounterThread;
+//    private OutboundQueueCounter outboundQueueCounterThread;
+//    private InboundQueueCounter inboundQueueCounterThread;
     private InboundServer inboundServer;
+
+    /**
+     * default constructor
+     */
+    public ServerMain() {
+        serviceProps = new HashMap<String, PushServiceProperty>();
+        outboundServers = new HashMap<String, OutboundServer>();
+        inboundQueues = new HashMap<String, InboundQueue>();
+    }
 
     /**
      * 서버 컴포넌트 기동
@@ -38,22 +47,19 @@ public class ServerMain {
         Map<String, PushServiceProperty> propertyBeans = context.getBeansOfType(PushServiceProperty.class);
         if (!propertyBeans.isEmpty()) {
             // PushServiceProperty 타입 빈들을 Service ID를 key로 하는 collection에 저장
-            serviceProps = new HashMap<String, PushServiceProperty>();
-            outboundServers = new HashMap<String, OutboundServer>();
-            inboundQueues = new HashMap<String, InboundQueue>();
             propertyBeans.forEach((beanName, property) -> {
                 String serviceId = property.getServiceId();
                 serviceProps.put(serviceId, property);
                 outboundServers.put(serviceId, new OutboundServer(property));
                 inboundQueues.put(serviceId, new InboundQueue(serviceId, property.getInboundQueueCapacity()));
             });
-
-            // startup OutboundServers
-            outboundServers.forEach((serviceId, outboundServer) -> outboundServer.startup());
-
-            // startup InboundQueue threads
-            inboundQueues.forEach((serviceId, inboundQueue) -> inboundQueue.start());
         }
+
+        // startup OutboundServers
+        outboundServers.forEach((serviceId, outboundServer) -> outboundServer.startup());
+
+        // startup InboundQueue threads
+        inboundQueues.forEach((serviceId, inboundQueue) -> inboundQueue.start());
 
         // TODO startup OutboundQueueCounter
 
@@ -61,7 +67,6 @@ public class ServerMain {
 
         // startup InboundServer
         inboundServer = context.getBean(InboundServer.class);
-        // TODO inject InboundQueues
         inboundServer.startup(inboundQueues);
 
         LOG.info("[simple-push-server] startup complete....");
@@ -80,13 +85,15 @@ public class ServerMain {
 
         // TODO shtudown OutboundQueueCounter
 
-        // TODO shtudown InboundQueue threads
+        // shtudown InboundQueue threads
         if (inboundQueues != null) {
             inboundQueues.forEach((serviceId, inboundQueue) -> inboundQueue.shutdown());
         }
 
-        // TODO shtudown OutboundServers
-
+        // shtudown OutboundServers
+        if (outboundServers != null) {
+            outboundServers.forEach((serviceId, outboundServer) -> outboundServer.startup());
+        }
     }
 
     /**

@@ -10,10 +10,14 @@ public class PushServiceProperty implements InitializingBean {
     private String serviceId;				// Push Service ID
     private int inboundQueueCapacity;		// Inbound Message Queue capacity
     private int outboundQueueCapacity;		// Outbound Message Queue capacity
-    private int outboundServerPort;		// Outbound Server listen port
+    private int outboundServerPort;			// Outbound Server listen port
     private ServerType outboundServerType;	// Outbound Server communication type
-    private String outboundServerWsUri;	// Outbound Server WebSocket URI, if Outbound Server type is WEBSOCKET
+    private String outboundServerWsUri;		// Outbound Server WebSocket URI, if Outbound Server type is WEBSOCKET
 
+    /**
+     * Spring bean property validation
+     * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+     */
     @Override
     public void afterPropertiesSet() {
         if (serviceId == null) {

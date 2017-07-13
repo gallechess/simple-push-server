@@ -56,6 +56,9 @@ public class InboundQueue extends Thread{
         }
     }
 
+    /**
+     * InboundQueue 쓰레드가 종료되도록 한다.
+     */
     public void shutdown() {
         this.interrupt();
     }
@@ -71,7 +74,7 @@ public class InboundQueue extends Thread{
         LOG.info("[{}] thread started", getName());
 
         PushMessage message = null;
-        while (true) {
+        while (!this.isInterrupted()) {
             try {
                 message = queue.take();
                 LOG.info("[{}] thread take {}", getName(), message);
