@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <bean id="inboundServer" class="chess.push.server.inbound.InboundServer">
+        <property name="port" value="8000" />
+    </bean>
+
+    <bean id="abstractPushServiceProperty" class="chess.push.server.property.PushServiceProperty" abstract="true">
+        <property name="inboundQueueCapacity" value="100000" />
+        <property name="outboundQueueCapacity" value="10000" />
+        <property name="outboundServerType" value="TCPSOCKET" />
+    </bean>
+
+    <bean parent="abstractPushServiceProperty">
+        <property name="serviceId" value="tcpsocket.test1" />
+        <property name="outboundServerPort" value="8100" />
+    </bean>
+    <bean parent="abstractPushServiceProperty">
+        <property name="serviceId" value="tcpsocket.test2" />
+        <property name="outboundServerPort" value="8101" />
+    </bean>
+    <bean parent="abstractPushServiceProperty">
+        <property name="serviceId" value="tcpsocket.test3" />
+        <property name="outboundServerPort" value="8102" />
+    </bean>
+    <bean parent="abstractPushServiceProperty">
+        <property name="serviceId" value="websocket.test1" />
+        <property name="outboundServerPort" value="8201" />
+        <property name="outboundServerType" value="WEBSOCKET" />
+        <property name="outboundServerWsUri" value="/test-websocket" />
+    </bean>
+
+</beans>

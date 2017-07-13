@@ -51,14 +51,12 @@
                 <directory>resource</directory>
             </resource>
         </resources>
-        <!--
         <testSourceDirectory>test</testSourceDirectory>
         <testResources>
             <testResource>
-                <directory>test-resource</directory>
+                <directory>testResource</directory>
             </testResource>
         </testResources>
-        -->
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -85,7 +83,6 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>2.6</version>
             </plugin>
-            <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -96,13 +93,14 @@
                         <goals>
                             <goal>jar</goal>
                         </goals>
+                        <!--
                         <configuration>
                             <additionalparam>-Xdoclint:none</additionalparam>
                         </configuration>
+                        -->
                     </execution>
                 </executions>
             </plugin>
-            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-install-plugin</artifactId>
