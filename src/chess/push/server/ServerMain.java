@@ -10,8 +10,10 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import chess.push.server.inbound.InboundServer;
 import chess.push.server.outbound.OutboundServer;
+import chess.push.server.outbound.OutboundServerFactory;
 import chess.push.server.property.PushServiceProperty;
 import chess.push.server.queue.InboundQueue;
+import chess.push.server.queue.OutboundQueueManager;
 
 /**
  * simple-push-server 서버 프로그램 entry class
@@ -20,9 +22,9 @@ public class ServerMain {
 
     private static final Logger LOG = LoggerFactory.getLogger(ServerMain.class);
 
-    private final Map<String, PushServiceProperty> serviceProps; // PushServiceProperty collection (key: Service ID)
-    private final Map<String, OutboundServer> outboundServers;   // OutboundServer collection (key: Service ID)
-    private final Map<String, InboundQueue> inboundQueues;       // InboundQueue collection (key: Service ID)
+    private final Map<String, OutboundServer> outboundServers;		// OutboundServer collection (key: Service ID)
+    private final Map<String, InboundQueue> inboundQueues;			// InboundQueue collection (key: Service ID)
+    private final OutboundQueueManager outboundQueueManager;		// 클라이언트 채널마다 생성될 OutboundQueue 인스턴스 관리자
 
 //    private OutboundQueueCounter outboundQueueCounterThread;
 //    private InboundQueueCounter inboundQueueCounterThread;
@@ -32,9 +34,9 @@ public class ServerMain {
      * default constructor
      */
     public ServerMain() {
-        serviceProps = new HashMap<String, PushServiceProperty>();
         outboundServers = new HashMap<String, OutboundServer>();
         inboundQueues = new HashMap<String, InboundQueue>();
+        outboundQueueManager = new OutboundQueueManager();
     }
 
     /**
@@ -46,12 +48,12 @@ public class ServerMain {
 
         Map<String, PushServiceProperty> propertyBeans = context.getBeansOfType(PushServiceProperty.class);
         if (!propertyBeans.isEmpty()) {
-            // PushServiceProperty 타입 빈들을 Service ID를 key로 하는 collection에 저장
+            // Push 서비스 속성 정보에 따라 인스턴스 생성하여 Service ID를 key로 하는 collection에 저장
             propertyBeans.forEach((beanName, property) -> {
                 String serviceId = property.getServiceId();
-                serviceProps.put(serviceId, property);
-                outboundServers.put(serviceId, new OutboundServer(property));
-                inboundQueues.put(serviceId, new InboundQueue(serviceId, property.getInboundQueueCapacity()));
+                outboundServers.put(serviceId, OutboundServerFactory.getInstance(property, outboundQueueManager));
+                inboundQueues.put(serviceId, new InboundQueue(serviceId, property.getInboundQueueCapacity(), outboundQueueManager));
+                outboundQueueManager.addOutboundQueueGroup(serviceId);
             });
         }
 

@@ -13,29 +13,24 @@ import chess.push.util.PushMessage;
  * -Service ID에 따라 별도의 인스턴스 존재<br>
  * -큐에 담긴 메시지를 OutboundQueue로 전달하기 위한 쓰레드 동작
  */
-public class InboundQueue extends Thread{
+public class InboundQueue extends Thread {
 
     private static final Logger LOG = LoggerFactory.getLogger(InboundQueue.class);
 
-    private String serviceId;					// Push Service ID
-    private BlockingQueue<PushMessage> queue;	// message queue
+    private final String serviceId;							// Push Service ID
+    private final BlockingQueue<PushMessage> queue;			// message queue
+    private final OutboundQueueManager outboundQueueManager;	// 클라이언트 채널마다 생성될 OutboundQueue 인스턴스 관리자
 
     /**
-     * constructor with paramters
+     * constructor with parameters
      * @param serviceId Push Service ID
      * @param capacity message queue capacity
+     * @param outboundQueueManager 클라이언트 채널마다 생성될 OutboundQueue 인스턴스 관리자
      */
-    public InboundQueue(String serviceId, int capacity) {
+    public InboundQueue(String serviceId, int capacity, OutboundQueueManager outboundQueueManager) {
         this.serviceId = serviceId;
-        queue = new LinkedBlockingQueue<PushMessage>(capacity);
-    }
-
-    public String serviceId() {
-        return serviceId;
-    }
-
-    public int count() {
-        return queue.size();
+        this.queue = new LinkedBlockingQueue<PushMessage>(capacity);
+        this.outboundQueueManager = outboundQueueManager;
     }
 
     /**
@@ -69,26 +64,26 @@ public class InboundQueue extends Thread{
      */
     @Override
     public void run() {
-        this.setName("InboundQueueThread:" + serviceId);
+        setName("InboundQueueThread:" + serviceId);
 
-        LOG.info("[{}] thread started", getName());
+        LOG.info("[{}] started", getName());
 
         PushMessage message = null;
-        while (!this.isInterrupted()) {
+        while (!isInterrupted()) {
             try {
                 message = queue.take();
-                LOG.info("[{}] thread take {}", getName(), message);
+                LOG.info("[{}] take {}", getName(), message);
             } catch (InterruptedException e) {
                 break;
             }
 
             if (message != null) {
-                // TODO MessageBroker에 메시지 전달
+                outboundQueueManager.transfer(message);
                 message = null;
             }
         }
 
-        LOG.info("[{}] thread shutdown", getName());
+        LOG.info("[{}] shutdown", getName());
     }
 
 }

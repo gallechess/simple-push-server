@@ -11,25 +11,25 @@
         <property name="port" value="8000" />
     </bean>
 
-    <bean id="abstractPushServiceProperty" class="chess.push.server.property.PushServiceProperty" abstract="true">
+    <bean id="pushServiceProperty" class="chess.push.server.property.PushServiceProperty" abstract="true">
         <property name="inboundQueueCapacity" value="100000" />
         <property name="outboundQueueCapacity" value="10000" />
         <property name="outboundServerType" value="TCPSOCKET" />
     </bean>
 
-    <bean parent="abstractPushServiceProperty">
+    <bean parent="pushServiceProperty">
         <property name="serviceId" value="tcpsocket.test1" />
         <property name="outboundServerPort" value="8100" />
     </bean>
-    <bean parent="abstractPushServiceProperty">
+    <bean parent="pushServiceProperty">
         <property name="serviceId" value="tcpsocket.test2" />
         <property name="outboundServerPort" value="8101" />
     </bean>
-    <bean parent="abstractPushServiceProperty">
+    <bean parent="pushServiceProperty">
         <property name="serviceId" value="tcpsocket.test3" />
         <property name="outboundServerPort" value="8102" />
     </bean>
-    <bean parent="abstractPushServiceProperty">
+    <bean parent="pushServiceProperty">
         <property name="serviceId" value="websocket.test1" />
         <property name="outboundServerPort" value="8201" />
         <property name="outboundServerType" value="WEBSOCKET" />

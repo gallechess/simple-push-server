@@ -4,30 +4,27 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import chess.push.server.property.PushServiceProperty;
-import chess.push.server.property.ServerType;
-import chess.push.util.MessageUtil;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
-import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 
 /**
  * 클라이언트와의 연결을 대기하는 Outbound Server
  */
-public class OutboundServer {
+public abstract class OutboundServer {
 
     private static final Logger LOG = LoggerFactory.getLogger(OutboundServer.class);
 
-    private PushServiceProperty property;	// Push Service property
+    private final PushServiceProperty property;	// Push Service property
+
     private EventLoopGroup bossGroup;		// EventLoopGroup that accepts an incoming connection
     private EventLoopGroup workerGroup;	// EventLoopGroup that handles the traffic of the accepted connection
     private ChannelFuture channelFuture;	// Outbound Server channel asynchronous bind result
@@ -56,18 +53,7 @@ public class OutboundServer {
             bootstrap.group(bossGroup, workerGroup)
                      .channel(NioServerSocketChannel.class)
                      .handler(new LoggingHandler(LogLevel.INFO))
-                     .childHandler(new ChannelInitializer<SocketChannel>() {
-                         @Override
-                         public void initChannel(SocketChannel ch) {
-                             ChannelPipeline pipeline = ch.pipeline();
-                             if (property.getOutboundServerType() == ServerType.TCPSOCKET) {
-                                 pipeline.addLast(new DelimiterBasedFrameDecoder(Integer.MAX_VALUE, MessageUtil.MSG_DELIMITER));
-                                 pipeline.addLast(new OutboundServerHandler(property));
-                             } else if (property.getOutboundServerType() == ServerType.WEBSOCKET) {
-                                 // TODO WebSocket 타입 서버 핸들러 설정
-                             }
-                         }
-                     })
+                     .childHandler(getChannelInitializer())
                      .option(ChannelOption.SO_REUSEADDR, true)
                      .childOption(ChannelOption.SO_KEEPALIVE, true)
                      .childOption(ChannelOption.TCP_NODELAY, true);
@@ -106,5 +92,11 @@ public class OutboundServer {
             bossGroup.shutdownGracefully();
         }
     }
+
+    /**
+     * ChannelInitializer 인스턴스를 생성한다.
+     * @return ChannelInitializer 인스턴스
+     */
+    protected abstract ChannelInitializer<SocketChannel> getChannelInitializer();
 
 }

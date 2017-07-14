@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import chess.push.server.queue.InboundQueue;
 import chess.push.util.MessageUtil;
+import chess.push.util.PushMessageDecoder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -18,8 +19,10 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
+import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.util.CharsetUtil;
 
 /**
  * Business Application으로부터 Push를 요청받는 Inbound Server<br>
@@ -60,6 +63,8 @@ public class InboundServer {
                          public void initChannel(SocketChannel ch) {
                              ChannelPipeline pipeline = ch.pipeline();
                              pipeline.addLast(new DelimiterBasedFrameDecoder(Integer.MAX_VALUE, MessageUtil.MSG_DELIMITER));
+                             pipeline.addLast(new StringDecoder(CharsetUtil.UTF_8));
+                             pipeline.addLast(new PushMessageDecoder());
                              pipeline.addLast(new InboundServerHandler(inboundQueues));
                          }
                      })

@@ -1,24 +1,19 @@
 package chess.push.server.inbound;
 
-import java.io.IOException;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import chess.push.server.queue.InboundQueue;
 import chess.push.util.PushMessage;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.util.CharsetUtil;
 
 /**
  * Inbound Server와 클라이언트간 연결된 채널에서 발생하는 이벤트 처리용 핸들러
  */
-public class InboundServerHandler extends SimpleChannelInboundHandler<Object> {
+public class InboundServerHandler extends SimpleChannelInboundHandler<PushMessage> {
 
     private static final Logger LOG = LoggerFactory.getLogger(InboundServerHandler.class);
 
@@ -40,48 +35,28 @@ public class InboundServerHandler extends SimpleChannelInboundHandler<Object> {
      */
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        LOG.info("[InboundServer] connected {}", ctx.channel());
+        LOG.info("[InboundServerHandler] connected {}", ctx.channel());
         ctx.fireChannelActive();
     }
 
     /**
      * 클라이언트로부터 메시지 수신했을 때 동작<br>
-     * -JSON 메시지를 객체로 바인딩<br>
-     * -InboundQueue에 추가
+     * -Service ID에 해당하는 InboundQueue에 추가
      * @param ctx ChannelHandlerContext object
      * @param msg 수신된 메시지
      * @see io.netty.channel.SimpleChannelInboundHandler#channelRead0(io.netty.channel.ChannelHandlerContext, java.lang.Object)
      */
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, Object msg) {
-        String msgStr = ((ByteBuf) msg).toString(CharsetUtil.UTF_8);
-
-        LOG.info("[InboundServer] received {} from {}", msgStr, ctx.channel());
-
-        PushMessage pushMessage = bindMessage(msgStr);
-        if (pushMessage == null) {
-            LOG.warn("[InboundServer] invalid message {}", pushMessage);
-            return;
-        }
+    protected void channelRead0(ChannelHandlerContext ctx, PushMessage msg) {
+        LOG.info("[InboundServerHandler] received {} from {}", msg, ctx.channel());
 
         // Service ID에 해당하는 Inbound Queue에 메시지 추가
-        String serviceId = pushMessage.getServiceId();
+        String serviceId = msg.getServiceId();
         if (inboundQueues.containsKey(serviceId)) {
-            inboundQueues.get(serviceId).enqueue(pushMessage);
+            inboundQueues.get(serviceId).enqueue(msg);
         } else {
-            LOG.warn("[InboundServer] invalid service id in message {}", pushMessage);
+            LOG.warn("[InboundServerHandler] invalid service id in message {}", msg);
         }
-    }
-
-    private PushMessage bindMessage(String jsonStr) {
-        PushMessage pushMessage = null;
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            pushMessage = mapper.readValue(jsonStr, PushMessage.class);
-        } catch (IOException e) {
-            LOG.error("[InboundServer] failed to bind a message " + jsonStr, e);
-        }
-        return pushMessage;
     }
 
     /**
@@ -92,7 +67,7 @@ public class InboundServerHandler extends SimpleChannelInboundHandler<Object> {
      */
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        LOG.info("[InboundServer] disconnected {}", ctx.channel());
+        LOG.info("[InboundServerHandler] disconnected {}", ctx.channel());
     }
 
     /**
@@ -105,7 +80,7 @@ public class InboundServerHandler extends SimpleChannelInboundHandler<Object> {
      */
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        LOG.error("[InboundServer] error " + ctx.channel() + ", it will be closed", cause);
+        LOG.error("[InboundServerHandler] error " + ctx.channel() + ", it will be closed", cause);
         ctx.close();
     }
 
