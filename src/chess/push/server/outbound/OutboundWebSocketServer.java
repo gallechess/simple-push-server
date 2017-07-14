@@ -51,7 +51,7 @@ public class OutboundWebSocketServer extends OutboundServer {
                 pipeline.addLast(new WebSocketServerProtocolHandler(property.getOutboundServerWsUri(), null, true));
                 // TODO HTTP Page 호출 핸들러 설정
                 pipeline.addLast(new WebSocketFrameDecoder(), new WebSocketFrameEncoder());
-                pipeline.addLast(new PushMessageDecoder(), new PushMessageEncoder(MessageUtil.MSG_DELIMITER_STR));
+                pipeline.addLast(new PushMessageDecoder(), new PushMessageEncoder());
                 pipeline.addLast(new OutboundServerHandler(property, outboundQueueManager));
             }
         };
