@@ -20,26 +20,28 @@ public class OutboundQueue extends Thread {
 
     private String serviceId;					// Push Service ID
     private BlockingQueue<PushMessage> queue;	// message queue
+    private final int capacity;				// message queue capacity
     private Channel channel;					// Client Channel instance
 
     /**
-     * OutboundQueue 인스턴스를 생성한다.
+     * constructor with parameters
      * @param serviceId Push Service ID
      * @param capacity message queue capacity
      * @param channel Netty Channel instance
      * @return OutboundQueue 인스턴스
      */
-    public static OutboundQueue getInstance(String serviceId, int capacity, Channel channel) {
-        OutboundQueue instance = new OutboundQueue();
-        instance.serviceId = serviceId;
-        instance.queue = new LinkedBlockingQueue<PushMessage>(capacity);
-        instance.channel = channel;
-        return instance;
+    public OutboundQueue(String serviceId, int capacity, Channel channel) {
+        this.serviceId = serviceId;
+        this.capacity = capacity;
+        this.queue = new LinkedBlockingQueue<PushMessage>(capacity);
+        this.channel = channel;
     }
 
-    private OutboundQueue() {}
-
-    private String clientId() {
+    /**
+     * 큐와 연관된 클라이언트 채널의 클라이언트ID를 반환한다.
+     * @return 클라이언트ID
+     */
+    public String clientId() {
         // 클라이언트ID는 런타임에 변경되므로 항상 채널에서 조회 필요
         return channel.attr(ChannelAttrKey.CLIENT_ID).get();
     }
@@ -62,6 +64,14 @@ public class OutboundQueue extends Thread {
         } else {
             LOG.error("[OutboundQueue:{}] [{}] failed to enqueue {}", serviceId, clientId(), message);
         }
+    }
+
+    /**
+     * 큐의 현재 상태를 문자열로 반환한다.
+     * @return 큐 상태
+     */
+    public String status() {
+        return "clientId: " + clientId() + ", channel: " + channel + ", capacity: " + capacity + ", current: " + queue.size();
     }
 
     /**

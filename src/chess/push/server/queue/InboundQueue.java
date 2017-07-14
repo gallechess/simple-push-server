@@ -19,6 +19,7 @@ public class InboundQueue extends Thread {
 
     private final String serviceId;							// Push Service ID
     private final BlockingQueue<PushMessage> queue;			// message queue
+    private final int capacity;								// message queue capacity
     private final OutboundQueueManager outboundQueueManager;	// 클라이언트 채널마다 생성될 OutboundQueue 인스턴스 관리자
 
     /**
@@ -29,6 +30,7 @@ public class InboundQueue extends Thread {
      */
     public InboundQueue(String serviceId, int capacity, OutboundQueueManager outboundQueueManager) {
         this.serviceId = serviceId;
+        this.capacity = capacity;
         this.queue = new LinkedBlockingQueue<PushMessage>(capacity);
         this.outboundQueueManager = outboundQueueManager;
     }
@@ -49,6 +51,14 @@ public class InboundQueue extends Thread {
         } else {
             LOG.error("[InboundQueue:{}] failed to enqueue {}", serviceId, message);
         }
+    }
+
+    /**
+     * 큐의 현재 상태를 문자열로 반환한다.
+     * @return 큐 상태
+     */
+    public String status() {
+        return "capacity: " + capacity + ", current: " + queue.size();
     }
 
     /**
@@ -78,8 +88,13 @@ public class InboundQueue extends Thread {
             }
 
             if (message != null) {
-                outboundQueueManager.transfer(message);
-                message = null;
+                try {
+                    outboundQueueManager.transfer(message);
+                } catch (Exception e) {
+                    LOG.error("[" + getName() + "] failed to transfer " + message, e);
+                } finally {
+                    message = null;
+                }
             }
         }
 

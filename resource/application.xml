@@ -7,33 +7,37 @@
                            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
                            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-    <bean id="inboundServer" class="chess.push.server.inbound.InboundServer">
-        <property name="port" value="8000" />
+    <context:annotation-config />
+
+    <bean id="baseProperty" class="chess.push.server.property.PushBaseProperty">
+        <property name="inboundServerPort" value="8000" />
+        <property name="inboundQueueCheckInterval" value="5" />
+        <property name="outboundQueueCheckInterval" value="5" />
     </bean>
 
-    <bean id="pushServiceProperty" class="chess.push.server.property.PushServiceProperty" abstract="true">
+    <bean abstract="true" id="serviceProperty" class="chess.push.server.property.PushServiceProperty">
         <property name="inboundQueueCapacity" value="100000" />
         <property name="outboundQueueCapacity" value="10000" />
         <property name="outboundServerType" value="TCPSOCKET" />
     </bean>
 
-    <bean parent="pushServiceProperty">
+    <bean parent="serviceProperty">
         <property name="serviceId" value="tcpsocket.test1" />
         <property name="outboundServerPort" value="8100" />
     </bean>
-    <bean parent="pushServiceProperty">
+    <bean parent="serviceProperty">
         <property name="serviceId" value="tcpsocket.test2" />
         <property name="outboundServerPort" value="8101" />
     </bean>
-    <bean parent="pushServiceProperty">
+    <bean parent="serviceProperty">
         <property name="serviceId" value="tcpsocket.test3" />
         <property name="outboundServerPort" value="8102" />
     </bean>
-    <bean parent="pushServiceProperty">
+    <bean parent="serviceProperty">
         <property name="serviceId" value="websocket.test1" />
         <property name="outboundServerPort" value="8201" />
         <property name="outboundServerType" value="WEBSOCKET" />
-        <property name="outboundServerWsUri" value="/test-websocket" />
+        <property name="outboundServerWsUri" value="/test1" />
     </bean>
 
 </beans>

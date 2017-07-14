@@ -1,36 +1,32 @@
 package chess.push.server.property;
 
-import org.springframework.beans.factory.InitializingBean;
+import javax.annotation.PostConstruct;
 
 /**
  * Push 서비스 속성을 설정하는 타입
  */
-public class PushServiceProperty implements InitializingBean {
+public class PushServiceProperty {
 
-    private String serviceId;              // Push Service ID
-    private int inboundQueueCapacity;	    // Inbound Message Queue capacity
-    private int outboundQueueCapacity;     // Outbound Message Queue capacity
-    private int outboundServerPort;        // Outbound Server listen port
-    private ServerType outboundServerType; // Outbound Server communication type
-    private String outboundServerWsUri;    // Outbound Server WebSocket URI, if Outbound Server type is WEBSOCKET
+    private String serviceId;				// Push Service ID
+    private int inboundQueueCapacity;		// Inbound Message Queue capacity
+    private int outboundQueueCapacity;		// Outbound Message Queue capacity
+    private int outboundServerPort;		// Outbound Server listen port
+    private ServerType outboundServerType;	// Outbound Server communication type
+    private String outboundServerWsUri;	// Outbound Server WebSocket URI, if Outbound Server type is WEBSOCKET
 
-    /**
-     * Spring bean property validation
-     * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
-     */
-    @Override
+    @PostConstruct
     public void afterPropertiesSet() {
         if (serviceId == null) {
             throw new IllegalArgumentException("The 'serviceId' property is null");
         }
         if (inboundQueueCapacity <= 0) {
-            throw new IllegalArgumentException("The 'inboundQueueCapacity' property is invalid");
+            throw new IllegalArgumentException("The 'inboundQueueCapacity' property is invalid [" + inboundQueueCapacity + "]");
         }
         if (outboundQueueCapacity <= 0) {
-            throw new IllegalArgumentException("The 'inboundQueueCapacity' property is invalid");
+            throw new IllegalArgumentException("The 'inboundQueueCapacity' property is invalid [" + outboundQueueCapacity + "]");
         }
         if (outboundServerPort <= 0) {
-            throw new IllegalArgumentException("The 'outboundServerPort' property is invalid");
+            throw new IllegalArgumentException("The 'outboundServerPort' property is invalid [" + outboundServerPort + "]");
         }
         if (outboundServerType == null) {
             throw new IllegalArgumentException("The 'outboundServerType' property is null");

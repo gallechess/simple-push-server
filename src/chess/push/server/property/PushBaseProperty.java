@@ -1,0 +1,48 @@
+package chess.push.server.property;
+
+import javax.annotation.PostConstruct;
+
+/**
+ * Push 서버 컴포너트 기본 속성을 설정하는 타입
+ */
+public class PushBaseProperty {
+
+    private int inboundServerPort;				// Inbound Server listen port
+    private int inboundQueueCheckInterval;		// InboundQueue 모니터링 주기(초)
+    private int outboundQueueCheckInterval;	// OutboundQueue 모니터링 주기(초)
+
+    @PostConstruct
+    public void afterPropertiesSet() {
+        if (inboundServerPort <= 0) {
+            throw new IllegalArgumentException("The 'inboundServerPort' property is invalid [" + inboundServerPort + "]");
+        }
+        if (inboundQueueCheckInterval <= 0) {
+            throw new IllegalArgumentException("The 'inboundQueueCheckInterval' property is invalid [" + inboundQueueCheckInterval + "]");
+        }
+        if (outboundQueueCheckInterval <= 0) {
+            throw new IllegalArgumentException("The 'outboundQueueCheckInterval' property is invalid [" + outboundQueueCheckInterval + "]");
+        }
+    }
+
+    public int getInboundServerPort() {
+        return inboundServerPort;
+    }
+    public void setInboundServerPort(int inboundServerPort) {
+        this.inboundServerPort = inboundServerPort;
+    }
+
+    public int getInboundQueueCheckInterval() {
+        return inboundQueueCheckInterval;
+    }
+    public void setInboundQueueCheckInterval(int inboundQueueCheckInterval) {
+        this.inboundQueueCheckInterval = inboundQueueCheckInterval;
+    }
+
+    public int getOutboundQueueCheckInterval() {
+        return outboundQueueCheckInterval;
+    }
+    public void setOutboundQueueCheckInterval(int outboundQueueCheckInterval) {
+        this.outboundQueueCheckInterval = outboundQueueCheckInterval;
+    }
+
+}
