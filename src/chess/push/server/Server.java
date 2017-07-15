@@ -18,19 +18,19 @@ import chess.push.server.queue.OutboundQueueChecker;
 import chess.push.server.queue.OutboundQueueManager;
 
 /**
- * simple-push-server 서버 라이프사이클 관리
+ * simple-push-server 서버 기동/종료 관리
  */
 public class Server {
 
     private static final Logger LOG = LoggerFactory.getLogger(Server.class);
 
-    private final Map<String, OutboundServer> outboundServers;		// Service ID를 key로 하는 OutboundServer collection
-    private final Map<String, InboundQueue> inboundQueues;			// Service ID를 key로 하는 InboundQueue collection
-    private final OutboundQueueManager outboundQueueManager;		// 클라이언트 채널마다 생성될 OutboundQueue 인스턴스 관리자
+    private final Map<String, OutboundServer> outboundServers;	// Service ID를 key로 하는 OutboundServer collection
+    private final Map<String, InboundQueue> inboundQueues;		// Service ID를 key로 하는 InboundQueue collection
+    private final OutboundQueueManager outboundQueueManager;	// OutboundQueue 인스턴스 라이프사이클 관리자
 
-    private OutboundQueueChecker outboundQueueChecker;
-    private InboundQueueChecker inboundQueueChecker;
-    private InboundServer inboundServer;
+    private OutboundQueueChecker outboundQueueChecker;	// OutboundQueue 상태 모니터링 쓰레드
+    private InboundQueueChecker inboundQueueChecker;	// InboundQueue 상태 모니터링 쓰레드
+    private InboundServer inboundServer;				// Push 요청을 수용하는 InboundServer
 
     public Server() {
         outboundServers = new HashMap<String, OutboundServer>();
@@ -39,15 +39,15 @@ public class Server {
     }
 
     /**
-     * 서버 컴포넌트 기동
-     * @param baseProperty Push 서버 컴포너트 기본 속성 정보
-     * @param serviceProperties Push 서비스 속성 정보 collection
+     * 서버 기동
+     * @param baseProperty Push 서버 기본 속성
+     * @param serviceProperties 개별 Push 서비스 속성 collection
      */
     public void startupServer(PushBaseProperty baseProperty, Collection<PushServiceProperty> serviceProperties) {
         LOG.info("[simple-push-server] starting...");
 
         if (!serviceProperties.isEmpty()) {
-            // Push 서비스 속성 정보에 따라 필요한 인스턴스 생성하고 Service ID를 key로 하는 collection에 저장
+            // 개별 Push 서비스 속성에 따라 필요한 인스턴스 생성하고 Service ID를 key로 하는 collection에 저장
             serviceProperties.forEach(property -> {
                 String serviceId = property.getServiceId();
                 outboundServers.put(serviceId, OutboundServerFactory.getInstance(property, outboundQueueManager));

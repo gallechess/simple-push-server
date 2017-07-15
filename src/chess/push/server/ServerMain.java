@@ -27,6 +27,7 @@ public class ServerMain {
             PushBaseProperty baseProperty = context.getBean(PushBaseProperty.class);
             Collection<PushServiceProperty> serviceProperties = context.getBeansOfType(PushServiceProperty.class).values();
 
+            // Push 서버 모듈 기동
             server.startupServer(baseProperty, serviceProperties);
 
             synchronized (ServerMain.class) {
