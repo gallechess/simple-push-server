@@ -11,19 +11,19 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
 /**
- * Outbound Server와 클라이언트간 연결된 채널에서 발생하는 이벤트 처리용 핸들러
+ * Outbound Server와 클라이언트간 채널에서 발생하는 이벤트 처리용 핸들러
  */
 public class OutboundServerHandler extends SimpleChannelInboundHandler<PushMessage> {
 
     private static final Logger LOG = LoggerFactory.getLogger(OutboundServerHandler.class);
 
-    private final PushServiceProperty property;				// Push Service property
-    private final OutboundQueueManager outboundQueueManager;	// 클라이언트 채널마다 생성될 OutboundQueue 인스턴스 관리자
+    private final PushServiceProperty property;					// Push Service property
+    private final OutboundQueueManager outboundQueueManager;	// OutboundQueue 인스턴스 관리자
 
     /**
      * constructor with parameters
      * @param property Push Service property
-     * @param outboundQueueManager 클라이언트 채널마다 생성될 OutboundQueue 인스턴스 관리자
+     * @param outboundQueueManager OutboundQueue 인스턴스 관리자
      */
     public OutboundServerHandler(PushServiceProperty property, OutboundQueueManager outboundQueueManager) {
         this.property = property;
@@ -33,7 +33,7 @@ public class OutboundServerHandler extends SimpleChannelInboundHandler<PushMessa
     /**
      * 클라이언트 채널이 연결되어 사용 가능한 상태가 되었을 때 동작<br>
      * -연결 정보 로깅<br>
-     * -클라이언트 채널에 대한 OutboundQueue 생성 후 쓰레드 시작
+     * -OutboundQueue 관리자에게 신규 OutboundQueue 시작 요청
      * @param ctx ChannelHandlerContext object
      * @see io.netty.channel.ChannelInboundHandlerAdapter#channelActive(io.netty.channel.ChannelHandlerContext)
      */
@@ -48,9 +48,9 @@ public class OutboundServerHandler extends SimpleChannelInboundHandler<PushMessa
 
     /**
      * 클라이언트로부터 메시지 수신했을 때 동작<br>
-     * -채널에 클라이언트ID 설정
+     * -클라이언트로부터의 메시지는 ID 전송으로 간주하여 채널에 클라이언트ID 설정
      * @param ctx ChannelHandlerContext object
-     * @param msg 수신된 메시지
+     * @param msg 수신 메시지
      * @see io.netty.channel.SimpleChannelInboundHandler#channelRead0(io.netty.channel.ChannelHandlerContext, java.lang.Object)
      */
     @Override
@@ -67,7 +67,7 @@ public class OutboundServerHandler extends SimpleChannelInboundHandler<PushMessa
     /**
      * 클라이언트 채널이 연결해제되어 사용 불가능한 상태가 되었을 때 동작<br>
      * -연결해제 정보 로깅<br>
-     * -클라이언트 채널에 대한 OutboundQueue 쓰레드 종료 후 제거
+     * -OutboundQueue 관리자에게 관련 OutboundQueue 종료 요청
      * @param ctx ChannelHandlerContext object
      * @see io.netty.channel.ChannelInboundHandlerAdapter#channelInactive(io.netty.channel.ChannelHandlerContext)
      */

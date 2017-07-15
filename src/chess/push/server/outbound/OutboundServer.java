@@ -17,7 +17,8 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 
 /**
- * 클라이언트와의 연결을 대기하는 Outbound Server
+ * 클라이언트 연결을 수용하는 Outbound Server의 abstract type<br>
+ * -Outbound Server 유형에 따라 하위 타입 정의
  */
 public abstract class OutboundServer {
 
@@ -26,7 +27,7 @@ public abstract class OutboundServer {
     private final PushServiceProperty property;	// Push Service property
 
     private EventLoopGroup bossGroup;		// EventLoopGroup that accepts an incoming connection
-    private EventLoopGroup workerGroup;	// EventLoopGroup that handles the traffic of the accepted connection
+    private EventLoopGroup workerGroup;		// EventLoopGroup that handles the traffic of the accepted connection
     private ChannelFuture channelFuture;	// Outbound Server channel asynchronous bind result
 
     /**
@@ -39,7 +40,6 @@ public abstract class OutboundServer {
 
     /**
      * OutboundServer 인스턴스를 기동한다.<br>
-     * -통신방식이 TCP Socket인 경우 TCP 스트림에 대한 메시지 구분자 지정<br>
      * -소켓채널에 대한 이벤트 핸들러 지정<br>
      * -소켓옵션 지정
      */
@@ -94,7 +94,7 @@ public abstract class OutboundServer {
     }
 
     /**
-     * ChannelInitializer 인스턴스를 생성한다.
+     * 채널에 이벤트 핸들러를 설정하는 ChannelInitializer 인스턴스를 생성한다.
      * @return ChannelInitializer 인스턴스
      */
     protected abstract ChannelInitializer<SocketChannel> getChannelInitializer();

@@ -18,13 +18,13 @@ import io.netty.util.CharsetUtil;
  */
 public class OutboundTcpSocketServer extends OutboundServer {
 
-    private final PushServiceProperty property;				// Push Service property
-    private final OutboundQueueManager outboundQueueManager;	// 클라이언트 채널마다 생성될 OutboundQueue 인스턴스 관리자
+    private final PushServiceProperty property;					// Push Service property
+    private final OutboundQueueManager outboundQueueManager;	// OutboundQueue 인스턴스 관리자
 
     /**
      * constructor with parameters
      * @param property Push Service property
-     * @param outboundQueueManager 클라이언트 채널마다 생성될 OutboundQueue 인스턴스 관리자
+     * @param outboundQueueManager OutboundQueue 인스턴스 관리자
      */
     public OutboundTcpSocketServer(PushServiceProperty property, OutboundQueueManager outboundQueueManager) {
         super(property);
