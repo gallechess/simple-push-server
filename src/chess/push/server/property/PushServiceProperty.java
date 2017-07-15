@@ -3,16 +3,16 @@ package chess.push.server.property;
 import javax.annotation.PostConstruct;
 
 /**
- * Push 서비스 속성을 설정하는 타입
+ * 개별 Push 서비스 속성 정의
  */
 public class PushServiceProperty {
 
     private String serviceId;				// Push Service ID
     private int inboundQueueCapacity;		// Inbound Message Queue capacity
     private int outboundQueueCapacity;		// Outbound Message Queue capacity
-    private int outboundServerPort;		// Outbound Server listen port
+    private int outboundServerPort;			// Outbound Server listen port
     private ServerType outboundServerType;	// Outbound Server communication type
-    private String outboundServerWsUri;	// Outbound Server WebSocket URI, if Outbound Server type is WEBSOCKET
+    private String outboundServerWsUri;		// Outbound Server WebSocket URI, if Outbound Server type is WEBSOCKET
 
     @PostConstruct
     public void afterPropertiesSet() {

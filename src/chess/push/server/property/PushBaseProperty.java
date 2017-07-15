@@ -3,13 +3,13 @@ package chess.push.server.property;
 import javax.annotation.PostConstruct;
 
 /**
- * Push 서버 컴포너트 기본 속성을 설정하는 타입
+ * Push 서버 모듈의 기본 속성 정의
  */
 public class PushBaseProperty {
 
     private int inboundServerPort;				// Inbound Server listen port
-    private int inboundQueueCheckInterval;		// InboundQueue 모니터링 주기(초)
-    private int outboundQueueCheckInterval;	// OutboundQueue 모니터링 주기(초)
+    private int inboundQueueCheckInterval;		// InboundQueue 상태 모니터링 주기 (초)
+    private int outboundQueueCheckInterval;		// OutboundQueue 상태 모니터링 주기 (초)
 
     @PostConstruct
     public void afterPropertiesSet() {
@@ -43,6 +43,17 @@ public class PushBaseProperty {
     }
     public void setOutboundQueueCheckInterval(int outboundQueueCheckInterval) {
         this.outboundQueueCheckInterval = outboundQueueCheckInterval;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(getClass().getSimpleName()).append("[")
+               .append("inboundServerPort=").append(inboundServerPort)
+               .append(", inboundQueueCheckInterval=").append(inboundQueueCheckInterval)
+               .append(", outboundQueueCheckInterval=").append(outboundQueueCheckInterval)
+               .append("]");
+        return builder.toString();
     }
 
 }
