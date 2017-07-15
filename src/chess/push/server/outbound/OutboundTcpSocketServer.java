@@ -2,7 +2,7 @@ package chess.push.server.outbound;
 
 import chess.push.server.property.PushServiceProperty;
 import chess.push.server.queue.OutboundQueueManager;
-import chess.push.util.MessageUtil;
+import chess.push.util.PushConstant;
 import chess.push.util.PushMessageDecoder;
 import chess.push.util.PushMessageEncoder;
 import io.netty.channel.ChannelInitializer;
@@ -43,9 +43,9 @@ public class OutboundTcpSocketServer extends OutboundServer {
             @Override
             public void initChannel(SocketChannel socketChannel) {
                 ChannelPipeline pipeline = socketChannel.pipeline();
-                pipeline.addLast(new DelimiterBasedFrameDecoder(Integer.MAX_VALUE, MessageUtil.MSG_DELIMITER));
+                pipeline.addLast(new DelimiterBasedFrameDecoder(Integer.MAX_VALUE, PushConstant.DEFAULT_DELIMITER));
                 pipeline.addLast(new StringDecoder(CharsetUtil.UTF_8), new StringEncoder(CharsetUtil.UTF_8));
-                pipeline.addLast(new PushMessageDecoder(), new PushMessageEncoder(MessageUtil.MSG_DELIMITER_STR));
+                pipeline.addLast(new PushMessageDecoder(), new PushMessageEncoder(PushConstant.DEFAULT_DELIMITER_STR));
                 pipeline.addLast(new OutboundServerHandler(property, outboundQueueManager));
             }
         };

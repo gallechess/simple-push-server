@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import chess.push.server.property.PushServiceProperty;
 import chess.push.server.queue.OutboundQueueManager;
-import chess.push.util.ChannelAttrKey;
+import chess.push.util.PushConstant;
 import chess.push.util.PushMessage;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -59,7 +59,7 @@ public class OutboundServerHandler extends SimpleChannelInboundHandler<PushMessa
 
         String clientId = msg.getClientId();
         if (clientId != null) {
-            ctx.channel().attr(ChannelAttrKey.CLIENT_ID).set(clientId);
+            ctx.channel().attr(PushConstant.CLIENT_ID).set(clientId);
             LOG.info("[OutboundServerHandler:{}] set client id [{}] to {}", clientId, ctx.channel());
         }
     }

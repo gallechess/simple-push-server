@@ -3,7 +3,7 @@ package chess.push.client;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import chess.push.util.MessageUtil;
+import chess.push.util.PushConstant;
 import chess.push.util.PushMessage;
 import chess.push.util.PushMessageEncoder;
 import io.netty.bootstrap.Bootstrap;
@@ -20,12 +20,13 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.CharsetUtil;
 
+// TODO Sender - 웹소켓 서버의 테스트 페이지에서 부하 발생시키도록 변경
 public final class TestSender {
 
     private static final String HOST = "127.0.0.1";
     private static final int PORT = 8000;
 
-    private static final PushMessage TEST_MSG = new PushMessage("tcpsocket.test1", null, "1234 abcd ~!@# 테스트 메시지");
+    private static final PushMessage TEST_MSG = new PushMessage("websocket.test1", null, "1234 abcd ~!@# 테스트 메시지");
     private static final int TEST_COUNT = 10;
 
     public static void main(String[] args) throws Exception {
@@ -39,7 +40,7 @@ public final class TestSender {
                          protected void initChannel(SocketChannel ch) throws Exception {
                              ChannelPipeline pipeline = ch.pipeline();
                              pipeline.addLast(new StringEncoder(CharsetUtil.UTF_8));
-                             pipeline.addLast(new PushMessageEncoder(MessageUtil.MSG_DELIMITER_STR));
+                             pipeline.addLast(new PushMessageEncoder(PushConstant.DEFAULT_DELIMITER_STR));
                              pipeline.addLast(new TestSenderHandler(TEST_MSG, TEST_COUNT));
                          }
                      });

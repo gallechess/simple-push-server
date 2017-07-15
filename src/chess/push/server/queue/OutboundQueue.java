@@ -6,7 +6,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import chess.push.util.ChannelAttrKey;
+import chess.push.util.PushConstant;
 import chess.push.util.PushMessage;
 import io.netty.channel.Channel;
 
@@ -43,7 +43,7 @@ public class OutboundQueue extends Thread {
      */
     public String clientId() {
         // 클라이언트ID는 런타임에 변경되므로 항상 채널에서 조회 필요
-        return channel.attr(ChannelAttrKey.CLIENT_ID).get();
+        return channel.attr(PushConstant.CLIENT_ID).get();
     }
 
     /**

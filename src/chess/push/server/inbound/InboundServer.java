@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import chess.push.server.queue.InboundQueue;
-import chess.push.util.MessageUtil;
+import chess.push.util.PushConstant;
 import chess.push.util.PushMessageDecoder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
@@ -67,7 +67,7 @@ public class InboundServer {
                          @Override
                          public void initChannel(SocketChannel ch) {
                              ChannelPipeline pipeline = ch.pipeline();
-                             pipeline.addLast(new DelimiterBasedFrameDecoder(Integer.MAX_VALUE, MessageUtil.MSG_DELIMITER));
+                             pipeline.addLast(new DelimiterBasedFrameDecoder(Integer.MAX_VALUE, PushConstant.DEFAULT_DELIMITER));
                              pipeline.addLast(new StringDecoder(CharsetUtil.UTF_8));
                              pipeline.addLast(new PushMessageDecoder());
                              pipeline.addLast(new InboundServerHandler(inboundQueues));

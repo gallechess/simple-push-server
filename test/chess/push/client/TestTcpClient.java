@@ -3,7 +3,7 @@ package chess.push.client;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import chess.push.util.MessageUtil;
+import chess.push.util.PushConstant;
 import chess.push.util.PushMessage;
 import chess.push.util.PushMessageDecoder;
 import chess.push.util.PushMessageEncoder;
@@ -38,9 +38,9 @@ public final class TestTcpClient {
                          @Override
                          protected void initChannel(SocketChannel ch) throws Exception {
                              ChannelPipeline pipeline = ch.pipeline();
-                             pipeline.addLast(new DelimiterBasedFrameDecoder(Integer.MAX_VALUE, MessageUtil.MSG_DELIMITER));
+                             pipeline.addLast(new DelimiterBasedFrameDecoder(Integer.MAX_VALUE, PushConstant.DEFAULT_DELIMITER));
                              pipeline.addLast(new StringDecoder(CharsetUtil.UTF_8), new StringEncoder(CharsetUtil.UTF_8));
-                             pipeline.addLast(new PushMessageDecoder(), new PushMessageEncoder(MessageUtil.MSG_DELIMITER_STR));
+                             pipeline.addLast(new PushMessageDecoder(), new PushMessageEncoder(PushConstant.DEFAULT_DELIMITER_STR));
                              pipeline.addLast(new TestClientHandler(CLIEND_ID));
                          }
                      });
