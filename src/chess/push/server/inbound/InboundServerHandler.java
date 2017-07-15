@@ -11,7 +11,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
 /**
- * Inbound Server와 클라이언트간 연결된 채널에서 발생하는 이벤트 처리용 핸들러
+ * Inbound Server와 송신자간 연결된 채널에서 발생하는 이벤트 처리용 핸들러
  */
 public class InboundServerHandler extends SimpleChannelInboundHandler<PushMessage> {
 
