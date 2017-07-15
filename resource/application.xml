@@ -9,6 +9,7 @@
 
     <context:annotation-config />
 
+    <!-- 서버 기본 속성 -->
     <bean id="baseProperty" class="chess.push.server.property.PushBaseProperty">
         <property name="inboundServerPort" value="8000" />
         <property name="inboundQueueCheckInterval" value="5" />
@@ -21,6 +22,7 @@
         <property name="outboundServerType" value="TCPSOCKET" />
     </bean>
 
+    <!-- 개별 Push 서비스 속성 -->
     <bean parent="serviceProperty">
         <property name="serviceId" value="tcpsocket.test1" />
         <property name="outboundServerPort" value="8100" />
