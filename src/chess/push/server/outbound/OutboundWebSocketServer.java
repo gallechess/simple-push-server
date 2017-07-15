@@ -2,7 +2,6 @@ package chess.push.server.outbound;
 
 import chess.push.server.property.PushServiceProperty;
 import chess.push.server.queue.OutboundQueueManager;
-import chess.push.util.MessageUtil;
 import chess.push.util.PushMessageDecoder;
 import chess.push.util.PushMessageEncoder;
 import chess.push.util.WebSocketFrameDecoder;
