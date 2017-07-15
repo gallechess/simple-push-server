@@ -103,7 +103,7 @@ public class Server {
 
         // shtudown OutboundServers
         if (outboundServers != null) {
-            outboundServers.forEach((serviceId, outboundServer) -> outboundServer.startup());
+            outboundServers.forEach((serviceId, outboundServer) -> outboundServer.shutdown());
         }
     }
 
