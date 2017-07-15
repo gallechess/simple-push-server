@@ -7,11 +7,8 @@ public class PushMessage {
 
     private String serviceId;	// Push 서비스 구분 (Outbound Server ID로 사용)
     private String clientId;	// Push 수신대상 구분 (null이면 serviceId에 해당하는 전체 클라이언트 대상)
-    private String message;	// Push 전송할 메시지
+    private String message;		// Push 전송할 메시지
 
-    /**
-     * default constructor
-     */
     public PushMessage() {}
 
     /**
