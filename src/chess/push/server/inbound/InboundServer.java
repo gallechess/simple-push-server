@@ -32,10 +32,10 @@ public class InboundServer {
 
     private static final Logger LOG = LoggerFactory.getLogger(InboundServer.class);
 
-    private final int port;				// Inbound Server listen port
+    private final int port;		// Inbound Server listen port
 
     private EventLoopGroup bossGroup;		// EventLoopGroup that accepts an incoming connection
-    private EventLoopGroup workerGroup;	// EventLoopGroup that handles the traffic of the accepted connection
+    private EventLoopGroup workerGroup;		// EventLoopGroup that handles the traffic of the accepted connection
     private ChannelFuture channelFuture;	// Inbound Server channel asynchronous bind result
 
     /**
