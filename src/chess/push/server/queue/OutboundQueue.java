@@ -11,7 +11,7 @@ import chess.push.util.PushMessage;
 import io.netty.channel.Channel;
 
 /**
- * Outbound Server에 연결된 클라이언트 채널마다 생성되는 큐 타입<br>
+ * Outbound Server에 연결된 클라이언트 채널에 따라 생성되는 큐<br>
  * -큐에 담긴 메시지를 클라이언트 채널로 전송하기 위한 쓰레드 동작
  */
 public class OutboundQueue extends Thread {
@@ -20,7 +20,7 @@ public class OutboundQueue extends Thread {
 
     private String serviceId;					// Push Service ID
     private BlockingQueue<PushMessage> queue;	// message queue
-    private final int capacity;				// message queue capacity
+    private final int capacity;					// message queue capacity
     private Channel channel;					// Client Channel instance
 
     /**
@@ -28,7 +28,7 @@ public class OutboundQueue extends Thread {
      * @param serviceId Push Service ID
      * @param capacity message queue capacity
      * @param channel Netty Channel instance
-     * @return OutboundQueue 인스턴스
+     * @return OutboundQueue instance
      */
     public OutboundQueue(String serviceId, int capacity, Channel channel) {
         this.serviceId = serviceId;
@@ -39,16 +39,16 @@ public class OutboundQueue extends Thread {
 
     /**
      * 큐와 연관된 클라이언트 채널의 클라이언트ID를 반환한다.
-     * @return 클라이언트ID
+     * @return 클라이언트 채널 속성 중 클라이언트ID
      */
     public String clientId() {
-        // 클라이언트ID는 런타임에 변경되므로 항상 채널에서 조회 필요
+        // 클라이언트ID는 런타임에 변경될 수 있으므로 항상 채널에서 조회 필요
         return channel.attr(PushConstant.CLIENT_ID).get();
     }
 
     /**
      * 큐에 메시지를 추가한다.
-     * @param message 추가할 Push 메시지
+     * @param message Push 메시지
      */
     public void enqueue(PushMessage message) {
         if (message == null
@@ -68,7 +68,7 @@ public class OutboundQueue extends Thread {
 
     /**
      * 큐의 현재 상태를 문자열로 반환한다.
-     * @return 큐 상태
+     * @return 큐 상태 문자열
      */
     public String status() {
         return "clientId: " + clientId() + ", channel: " + channel + ", capacity: " + capacity + ", current: " + queue.size();

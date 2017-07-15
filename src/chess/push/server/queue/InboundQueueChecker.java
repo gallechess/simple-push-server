@@ -14,12 +14,12 @@ public class InboundQueueChecker extends Thread {
     private static final Logger LOG = LoggerFactory.getLogger(InboundQueueChecker.class);
 
     private final Map<String, InboundQueue> inboundQueues;	// Service ID를 key로 하는 InboundQueue collection
-    private final int inboundQueueCheckInterval;			// InboundQueue 모니터링 주기(초)
+    private final int inboundQueueCheckInterval;			// InboundQueue 모니터링 주기 (초)
 
     /**
      * constructor with parameters
      * @param inboundQueues Service ID를 key로 하는 InboundQueue collection
-     * @param inboundQueueCheckInterval InboundQueue 모니터링 주기(초)
+     * @param inboundQueueCheckInterval InboundQueue 모니터링 주기 (초)
      */
     public InboundQueueChecker(Map<String, InboundQueue> inboundQueues, int inboundQueueCheckInterval) {
         this.inboundQueues = inboundQueues;
@@ -54,12 +54,14 @@ public class InboundQueueChecker extends Thread {
             }
             LOG.info("\n* Inbound Queue Status\n{}", builder);
 
-            if (!isInterrupted()) {
-                try {
-                    TimeUnit.SECONDS.sleep(inboundQueueCheckInterval);
-                } catch (InterruptedException e) {
-                    break;
-                }
+            if (isInterrupted()) {
+                break;
+            }
+
+            try {
+                TimeUnit.SECONDS.sleep(inboundQueueCheckInterval);
+            } catch (InterruptedException e) {
+                break;
             }
         }
 

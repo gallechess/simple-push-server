@@ -9,12 +9,13 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelId;
 
 /**
- * 클라이언트 채널에 대한 OutboundQueue 인스턴스 라이프사이클 관리자
+ * 클라이언트 채널에 전송할 메시지를 보관하는 OutboundQueue 인스턴스 라이프사이클 관리자<br>
+ * -OutboundQueue는 클라이언트 채널마다 개별 인스턴스 존재
  */
 public class OutboundQueueManager {
 
-    // 서비스ID에 따라 OutboundQueue 그룹을 보관하는 collection
-    // -OutboundQueue 그룹은 Netty Channel 인스턴스의 ChannelId를 key로 하여 관리
+    // 서비스ID에 따른 OutboundQueue 그룹을 보관하는 collection
+    // -OutboundQueue 그룹 내부에서는 Netty Channel 인스턴스의 ChannelId를 key로 하여 관리
     private final Map<String, Map<ChannelId, OutboundQueue>> outboundQueueGroups;
 
     public OutboundQueueManager() {
@@ -34,7 +35,7 @@ public class OutboundQueueManager {
     }
 
     /**
-     * 클라이언트 채널에 대한 OutboundQueue 인스턴스를 생성하여 쓰레드를 기동하고 OutboundQueue 그룹에 보관한다.
+     * 신규 클라이언트 채널에 대한 OutboundQueue 인스턴스를 생성하여 쓰레드를 기동하고 OutboundQueue 그룹에 보관한다.
      * @param serviceId 서비스ID
      * @param capacity queue capacity
      * @param channel 클라이언트 채널
@@ -54,7 +55,7 @@ public class OutboundQueueManager {
     }
 
     /**
-     * 클라이언트 채널에 대한 OutboundQueue 쓰레드를 종료하고 OutboundQueue 그룹에서 제거한다.
+     * 기존 클라이언트 채널에 대한 OutboundQueue 쓰레드를 종료하고 OutboundQueue 그룹에서 제거한다.
      * @param serviceId 서비스ID
      * @param channel 클라이언트 채널
      */
@@ -98,8 +99,8 @@ public class OutboundQueueManager {
     }
 
     /**
-     * 서비스ID에 따른 OutboundQueue 그룹 collection을 반환한다. (read-only)
-     * @return OutboundQueue 그룹 collection
+     * 서비스ID에 따른 OutboundQueue 그룹 collection을 반환한다.
+     * @return OutboundQueue 그룹 collection (read-only)
      */
     public Map<String, Map<ChannelId, OutboundQueue>> outboundQueueGroups() {
         return Collections.unmodifiableMap(outboundQueueGroups);

@@ -9,24 +9,24 @@ import org.slf4j.LoggerFactory;
 import chess.push.util.PushMessage;
 
 /**
- * Inbound Server가 수신하는 메시지를 분류하는 큐 타입<br>
- * -Service ID에 따라 별도의 인스턴스 존재<br>
+ * Inbound Server가 수신하는 메시지를 Service ID에 따라 보관하는 큐<br>
+ * -Service ID에 따라 개별 인스턴스 존재<br>
  * -큐에 담긴 메시지를 OutboundQueue로 전달하기 위한 쓰레드 동작
  */
 public class InboundQueue extends Thread {
 
     private static final Logger LOG = LoggerFactory.getLogger(InboundQueue.class);
 
-    private final String serviceId;							// Push Service ID
-    private final BlockingQueue<PushMessage> queue;			// message queue
-    private final int capacity;								// message queue capacity
-    private final OutboundQueueManager outboundQueueManager;	// 클라이언트 채널마다 생성될 OutboundQueue 인스턴스 관리자
+    private final String serviceId;								// Push Service ID
+    private final BlockingQueue<PushMessage> queue;				// message queue
+    private final int capacity;									// message queue capacity
+    private final OutboundQueueManager outboundQueueManager;	// OutboundQueue 인스턴스 관리자
 
     /**
      * constructor with parameters
      * @param serviceId Push Service ID
      * @param capacity message queue capacity
-     * @param outboundQueueManager 클라이언트 채널마다 생성될 OutboundQueue 인스턴스 관리자
+     * @param outboundQueueManager OutboundQueue 인스턴스 관리자
      */
     public InboundQueue(String serviceId, int capacity, OutboundQueueManager outboundQueueManager) {
         this.serviceId = serviceId;
@@ -37,7 +37,7 @@ public class InboundQueue extends Thread {
 
     /**
      * 큐에 메시지를 추가한다.
-     * @param message 추가할 Push 메시지
+     * @param message Push 메시지
      */
     public void enqueue(PushMessage message) {
         if (message == null || !serviceId.equals(message.getServiceId())) {
@@ -55,7 +55,7 @@ public class InboundQueue extends Thread {
 
     /**
      * 큐의 현재 상태를 문자열로 반환한다.
-     * @return 큐 상태
+     * @return 큐 상태 문자열
      */
     public String status() {
         return "capacity: " + capacity + ", current: " + queue.size();

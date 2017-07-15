@@ -16,12 +16,12 @@ public class OutboundQueueChecker extends Thread {
     private static final Logger LOG = LoggerFactory.getLogger(OutboundQueueChecker.class);
 
     private final OutboundQueueManager outboundQueueManager;	// 서비스ID에 따라 OutboundQueue 그룹을 보관하는 collection
-    private final int outboundQueueCheckInterval;				// OutboundQueue 모니터링 주기(초)
+    private final int outboundQueueCheckInterval;				// OutboundQueue 모니터링 주기 (초)
 
     /**
      * constructor with parameters
      * @param outboundQueueManager 서비스ID에 따라 OutboundQueue 그룹을 보관하는 collection
-     * @param outboundQueueCheckInterval OutboundQueue 모니터링 주기(초)
+     * @param outboundQueueCheckInterval OutboundQueue 모니터링 주기 (초)
      */
     public OutboundQueueChecker(OutboundQueueManager outboundQueueManager, int outboundQueueCheckInterval) {
         this.outboundQueueManager = outboundQueueManager;
@@ -60,12 +60,14 @@ public class OutboundQueueChecker extends Thread {
             });
             LOG.info("\n* Inbound Queue Status\n{}", builder);
 
-            if (!isInterrupted()) {
-                try {
-                    TimeUnit.SECONDS.sleep(outboundQueueCheckInterval);
-                } catch (InterruptedException e) {
-                    break;
-                }
+            if (isInterrupted()) {
+                break;
+            }
+
+            try {
+                TimeUnit.SECONDS.sleep(outboundQueueCheckInterval);
+            } catch (InterruptedException e) {
+                break;
             }
         }
 
