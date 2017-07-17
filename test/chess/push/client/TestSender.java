@@ -20,16 +20,25 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.CharsetUtil;
 
-// TODO Sender - 웹소켓 서버의 테스트 페이지에서 부하 발생시키도록 변경
 public final class TestSender {
 
-    private static final String HOST = "127.0.0.1";
-    private static final int PORT = 8000;
-
-    private static final PushMessage TEST_MSG = new PushMessage("websocket.test1", null, "1234 abcd ~!@# 테스트 메시지");
-    private static final int TEST_COUNT = 10;
+//    private static final String TEST_SERVICE_ID = "test1.tcpsocket";
+    private static final String TEST_SERVICE_ID = "test2.websocket";
+    private static final String TEST_CLIENT_ID = null;
+//    private static final String TEST_CLIENT_ID = "testTcpSocketClient1";
+//    private static final String TEST_CLIENT_ID = "testWebSocketClient1";
+    private static final int TEST_COUNT = 1000;
+    private static final String DEFAULT_INBOUND_SERVER_HOST = "127.0.0.1";
+    private static final int DEFAULT_INBOUND_SERVER_PORT = 8000;
 
     public static void main(String[] args) throws Exception {
+        String testServiceId = System.getProperty("testServiceId", TEST_SERVICE_ID);
+        String testClientId = System.getProperty("testClientId", TEST_CLIENT_ID);
+        int testCount = Integer.parseInt(System.getProperty("testCount", String.valueOf(TEST_COUNT)));
+
+        String inboundServerHost = System.getProperty("inboundServerHost", DEFAULT_INBOUND_SERVER_HOST);
+        int inboundServerPort = Integer.parseInt(System.getProperty("inboundServerPort", String.valueOf(DEFAULT_INBOUND_SERVER_PORT)));
+
         EventLoopGroup group = new NioEventLoopGroup();
         try {
             Bootstrap bootstrap = new Bootstrap();
@@ -41,11 +50,22 @@ public final class TestSender {
                              ChannelPipeline pipeline = ch.pipeline();
                              pipeline.addLast(new StringEncoder(CharsetUtil.UTF_8));
                              pipeline.addLast(new PushMessageEncoder(PushConstant.DEFAULT_DELIMITER_STR));
-                             pipeline.addLast(new TestSenderHandler(TEST_MSG, TEST_COUNT));
+                             pipeline.addLast(new TestSenderHandler());
                          }
                      });
 
-            bootstrap.connect(HOST, PORT).sync().channel().closeFuture().sync();
+            ChannelFuture future = bootstrap.connect(inboundServerHost, inboundServerPort);
+
+            future.addListener(new ChannelFutureListener() {
+                @Override
+                public void operationComplete(ChannelFuture future) throws Exception {
+                    for (int idx = 0; idx < testCount; idx++) {
+                        PushMessage message = new PushMessage(testServiceId, testClientId, "test message [" + idx + "]");
+                        future.channel().writeAndFlush(message);
+                        Thread.sleep(10L);
+                    }
+                }
+            }).addListener(ChannelFutureListener.CLOSE).sync();
 
         } finally {
             group.shutdownGracefully();
@@ -57,28 +77,9 @@ class TestSenderHandler extends SimpleChannelInboundHandler<PushMessage> {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestSenderHandler.class);
 
-    private final PushMessage testMsg;
-    private final int testCount;
-
-    public TestSenderHandler(PushMessage testMsg, int testCount) {
-        this.testMsg = testMsg;
-        this.testCount = testCount;
-    }
-
-    @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        ChannelFuture channelFuture = null;
-        for (int idx = 0; idx < testCount; idx++) {
-            channelFuture = ctx.channel().writeAndFlush(testMsg);
-            LOG.info("[TestSenderHandler] sent {} to {}", testMsg, ctx.channel());
-        }
-        LOG.info("[TestSenderHandler] channel closing...");
-        channelFuture.addListener(ChannelFutureListener.CLOSE);
-    }
-
     @Override
     public void channelRead0(ChannelHandlerContext ctx, PushMessage msg) throws Exception {
-        LOG.info("[TestSenderHandler] received {} from {}", msg, ctx.channel());
+        // do nothing
     }
 
     @Override

@@ -24,11 +24,14 @@ import io.netty.util.CharsetUtil;
 public final class TestTcpSocketClient {
 
     private static final String CLIEND_ID = "testTcpSocketClient1";
-
-    private static final String OUTBOUND_SERVER_HOST = "127.0.0.1";
-    private static final int OUTBOUND_SERVER_PORT = 8001;
+    private static final String DEFAULT_OUTBOUND_SERVER_HOST = "127.0.0.1";
+    private static final int DEFAULT_OUTBOUND_SERVER_PORT = 8001;
 
     public static void main(String[] args) throws Exception {
+        String clientId = System.getProperty("clientId", CLIEND_ID);
+        String outboundServerHost = System.getProperty("inboundServerHost", DEFAULT_OUTBOUND_SERVER_HOST);
+        int outboundServerPort = Integer.parseInt(System.getProperty("inboundServerPort", String.valueOf(DEFAULT_OUTBOUND_SERVER_PORT)));
+
         EventLoopGroup group = new NioEventLoopGroup();
         try {
             Bootstrap bootstrap = new Bootstrap();
@@ -41,11 +44,11 @@ public final class TestTcpSocketClient {
                              pipeline.addLast(new DelimiterBasedFrameDecoder(Integer.MAX_VALUE, PushConstant.DEFAULT_DELIMITER));
                              pipeline.addLast(new StringDecoder(CharsetUtil.UTF_8), new StringEncoder(CharsetUtil.UTF_8));
                              pipeline.addLast(new PushMessageDecoder(), new PushMessageEncoder(PushConstant.DEFAULT_DELIMITER_STR));
-                             pipeline.addLast(new TestClientHandler(CLIEND_ID));
+                             pipeline.addLast(new TestClientHandler(clientId));
                          }
                      });
 
-            bootstrap.connect(OUTBOUND_SERVER_HOST, OUTBOUND_SERVER_PORT).sync().channel().closeFuture().sync();
+            bootstrap.connect(outboundServerHost, outboundServerPort).sync().channel().closeFuture().sync();
 
         } finally {
             group.shutdownGracefully();
