@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import chess.push.util.PushMessage;
+import chess.push.common.PushMessage;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelId;
 

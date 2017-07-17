@@ -1,4 +1,4 @@
-package chess.push.util;
+package chess.push.common;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;

@@ -3,10 +3,10 @@ package chess.push.client;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import chess.push.util.PushConstant;
-import chess.push.util.PushMessage;
-import chess.push.util.PushMessageDecoder;
-import chess.push.util.PushMessageEncoder;
+import chess.push.common.PushConstant;
+import chess.push.common.PushMessage;
+import chess.push.common.PushMessageDecoder;
+import chess.push.common.PushMessageEncoder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;

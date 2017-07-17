@@ -6,7 +6,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import chess.push.util.PushMessage;
+import chess.push.common.PushMessage;
 
 /**
  * Inbound Server가 수신하는 메시지를 Service ID에 따라 보관하는 큐<br>

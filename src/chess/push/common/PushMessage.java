@@ -1,4 +1,4 @@
-package chess.push.util;
+package chess.push.common;
 
 /**
  * Push 메시지를 바인딩할 객체 타입

@@ -1,4 +1,4 @@
-package chess.push.util;
+package chess.push.common;
 
 import java.io.IOException;
 import java.util.List;

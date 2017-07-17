@@ -1,11 +1,11 @@
 package chess.push.server.outbound;
 
+import chess.push.common.PushMessageDecoder;
+import chess.push.common.PushMessageEncoder;
+import chess.push.common.WebSocketFrameDecoder;
+import chess.push.common.WebSocketFrameEncoder;
 import chess.push.server.property.PushServiceProperty;
 import chess.push.server.queue.OutboundQueueManager;
-import chess.push.util.PushMessageDecoder;
-import chess.push.util.PushMessageEncoder;
-import chess.push.util.WebSocketFrameDecoder;
-import chess.push.util.WebSocketFrameEncoder;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;

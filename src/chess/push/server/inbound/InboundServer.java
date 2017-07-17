@@ -5,9 +5,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import chess.push.common.PushConstant;
+import chess.push.common.PushMessageDecoder;
 import chess.push.server.queue.InboundQueue;
-import chess.push.util.PushConstant;
-import chess.push.util.PushMessageDecoder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;

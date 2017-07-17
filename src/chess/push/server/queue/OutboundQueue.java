@@ -6,8 +6,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import chess.push.util.PushConstant;
-import chess.push.util.PushMessage;
+import chess.push.common.PushConstant;
+import chess.push.common.PushMessage;
 import io.netty.channel.Channel;
 
 /**
