@@ -17,4 +17,24 @@
         <appender-ref ref="ConsoleAppender" />
     </logger>
 
+    <logger name="chess.push.server.inbound" level="DEBUG" additivity="false">
+        <appender-ref ref="ConsoleAppender" />
+    </logger>
+
+    <logger name="chess.push.server.outbound" level="DEBUG" additivity="false">
+        <appender-ref ref="ConsoleAppender" />
+    </logger>
+
+    <logger name="chess.push.server.queue" level="DEBUG" additivity="false">
+        <appender-ref ref="ConsoleAppender" />
+    </logger>
+
+    <logger name="chess.push.server.queue.InboundQueueChecker" level="DEBUG" additivity="false">
+        <appender-ref ref="ConsoleAppender" />
+    </logger>
+
+    <logger name="chess.push.server.queue.OutboundQueueChecker" level="DEBUG" additivity="false">
+        <appender-ref ref="ConsoleAppender" />
+    </logger>
+
 </configuration>
