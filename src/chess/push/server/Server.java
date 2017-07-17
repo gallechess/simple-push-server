@@ -40,10 +40,12 @@ public class Server {
 
     /**
      * 서버 기동
+     * @param embedded embedded 모드로 기동할지 여부 (embedded 모드는 Inbound Server를 기동하지 않음)
      * @param baseProperty Push 서버 기본 속성
      * @param serviceProperties 개별 Push 서비스 속성 collection
+     * @return Service ID를 key로 하는 InboundQueue collection
      */
-    public void startupServer(PushBaseProperty baseProperty, Collection<PushServiceProperty> serviceProperties) {
+    public Map<String, InboundQueue> startupServer(boolean embedded, PushBaseProperty baseProperty, Collection<PushServiceProperty> serviceProperties) {
         LOG.info("[simple-push-server] starting...");
 
         if (!serviceProperties.isEmpty()) {
@@ -71,10 +73,14 @@ public class Server {
         inboundQueueChecker.start();
 
         // startup InboundServer
-        inboundServer = new InboundServer(baseProperty.getInboundServerPort());
-        inboundServer.startup(inboundQueues);
+        if (!embedded) {
+            inboundServer = new InboundServer(baseProperty.getInboundServerPort());
+            inboundServer.startup(inboundQueues);
+        }
 
         LOG.info("[simple-push-server] startup complete....");
+
+        return inboundQueues;
     }
 
     /**
