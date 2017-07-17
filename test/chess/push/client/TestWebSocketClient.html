@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Test WebSocket Client</title>
+        <script>
+            var socket = null;
+            var count = 0;
+            function connect() {
+                disconnect();
+                var ip = document.getElementById("ip").value;
+                var port = document.getElementById("port").value;
+                var uri = document.getElementById("uri").value;
+                if (!ip || !port || !uri) {
+                    alert("input ip/port/uri");
+                    return false;
+                }
+                var webSocketUrl = "ws://" + ip + ":" + port + "/" + uri;
+                var clientId = document.getElementById("clientId").value;
+                if (!clientId) {
+                    clientId = null;
+                }
+
+                socket = new WebSocket(webSocketUrl);
+                socket.onopen = function() {
+                    log("WebSocket opend");
+                    if (clientId) {
+                        socket.send(JSON.stringify({clientId:clientId}));
+                        log("sent client id [" + clientId + "]");
+                    }
+                };
+                socket.onmessage = function(e) {
+                    log("received [" + ++count + "] [" + e.data + "]");
+                };
+                socket.onerror = function() {
+                    log("WebSocket error");
+                };
+                socket.onclose = function() {
+                    log("WebSocket closed");
+                };
+            }
+
+            function disconnect() {
+                if (socket && socket.readyState == WebSocket.OPEN) {
+                    count = 0;
+                    socket.close();
+                }
+            }
+
+            var logger = null;
+            function log(msg) {
+                if (!logger) {
+                    logger = document.getElementById("log");
+                }
+                if (count != 0 && count % 100 == 0) {
+                    logger.innerHTML = msg;
+                } else {
+                    logger.innerHTML = msg + "\n" + logger.innerHTML;
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <h2>[simple-push-server] Test WebSocket Client</h2>
+        <table border="1" cellspacing="0" cellpadding="5">
+            <tbody>
+                <tr>
+                    <td>WebSocket URL</td>
+                    <td>ws://<input type="text" id="ip" value="127.0.0.1" size="10" />:<input type="text" id="port" value="8002" size="3" />/<input type="text" id="uri" value="test2" size="10" /></td>
+                </tr>
+                <tr>
+                    <td>Client ID</td>
+                    <td><input type="text" id="clientId" value="testWebSocketClient1" /></td>
+                </tr>
+            </tbody>
+        </table>
+        <button onclick="connect()">connect</button>
+        <button onclick="disconnect()">disconnect</button>
+        <hr />
+        <textarea id="log" style="width:100%;" rows="30"></textarea>
+    </body>
+</html>
