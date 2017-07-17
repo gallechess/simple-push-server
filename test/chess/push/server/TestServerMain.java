@@ -10,16 +10,10 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import chess.push.server.property.PushBaseProperty;
 import chess.push.server.property.PushServiceProperty;
 
-/**
- * simple-push-server 서버 entry class
- */
-public class ServerMain {
+public class TestServerMain {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ServerMain.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TestServerMain.class);
 
-    /**
-     * entry point
-     */
     public static void main(String[] args) {
         Server server = new Server();
 
@@ -30,8 +24,8 @@ public class ServerMain {
             // Push 서버 모듈 기동
             server.startupServer(false, baseProperty, serviceProperties);
 
-            synchronized (ServerMain.class) {
-                ServerMain.class.wait();
+            synchronized (TestServerMain.class) {
+                TestServerMain.class.wait();
             }
 
         } catch (Exception e) {
