@@ -28,7 +28,6 @@ public class OutboundQueue extends Thread {
      * @param serviceId Push Service ID
      * @param capacity message queue capacity
      * @param channel Netty Channel instance
-     * @return OutboundQueue instance
      */
     public OutboundQueue(String serviceId, int capacity, Channel channel) {
         this.serviceId = serviceId;

@@ -22,7 +22,7 @@ public class WebSocketFrameDecoder extends MessageToMessageDecoder<WebSocketFram
      * WebSocketFrame 타입 메시지를 String 타입으로 변환한다.<br>
      * -WebSocketFrame 타입 중 TextWebSocketFrame 타입만 처리하며, 다른 타입은 {@link UnsupportedOperationException}를 발생시킨다.
      * @param ctx the {@link ChannelHandlerContext} which this {@link MessageToMessageDecoder} belongs to
-     * @param msg the message to decode to an other one
+     * @param frame the message to decode to an other one
      * @param out the {@link List} to which decoded messages should be added
      * @see io.netty.handler.codec.MessageToMessageDecoder#decode(io.netty.channel.ChannelHandlerContext, java.lang.Object, java.util.List)
      */
