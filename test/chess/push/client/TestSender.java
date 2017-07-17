@@ -59,8 +59,8 @@ public final class TestSender {
             future.addListener(new ChannelFutureListener() {
                 @Override
                 public void operationComplete(ChannelFuture future) throws Exception {
-                    for (int idx = 0; idx < testCount; idx++) {
-                        PushMessage message = new PushMessage(testServiceId, testClientId, "test message [" + idx + "]");
+                    for (int cnt = 1; cnt <= testCount; cnt++) {
+                        PushMessage message = new PushMessage(testServiceId, testClientId, "test message [" + cnt + "]");
                         future.channel().writeAndFlush(message);
                         Thread.sleep(10L);
                     }
