@@ -19,27 +19,19 @@
     <bean abstract="true" id="serviceProperty" class="chess.push.server.property.PushServiceProperty">
         <property name="inboundQueueCapacity" value="100000" />
         <property name="outboundQueueCapacity" value="10000" />
-        <property name="outboundServerType" value="TCPSOCKET" />
     </bean>
 
     <!-- 개별 Push 서비스 속성 -->
     <bean parent="serviceProperty">
-        <property name="serviceId" value="tcpsocket.test1" />
-        <property name="outboundServerPort" value="8100" />
+        <property name="serviceId" value="test1.tcpsocket" />
+        <property name="outboundServerPort" value="8001" />
+        <property name="outboundServerType" value="TCPSOCKET" />
     </bean>
     <bean parent="serviceProperty">
-        <property name="serviceId" value="tcpsocket.test2" />
-        <property name="outboundServerPort" value="8101" />
-    </bean>
-    <bean parent="serviceProperty">
-        <property name="serviceId" value="tcpsocket.test3" />
-        <property name="outboundServerPort" value="8102" />
-    </bean>
-    <bean parent="serviceProperty">
-        <property name="serviceId" value="websocket.test1" />
-        <property name="outboundServerPort" value="8201" />
+        <property name="serviceId" value="test2.websocket" />
+        <property name="outboundServerPort" value="8002" />
         <property name="outboundServerType" value="WEBSOCKET" />
-        <property name="outboundServerWsUri" value="/test1" />
+        <property name="outboundServerWsUri" value="/test2" />
     </bean>
 
 </beans>
