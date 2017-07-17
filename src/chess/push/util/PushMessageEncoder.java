@@ -43,7 +43,7 @@ public class PushMessageEncoder extends MessageToMessageEncoder<PushMessage> {
      */
     @Override
     protected void encode(ChannelHandlerContext ctx, PushMessage msg, List<Object> out) {
-        LOG.info("[PushMessageEncoder] encode {} to channel {}", msg, ctx.channel());
+        LOG.debug("[PushMessageEncoder] encode {} to channel {}", msg, ctx.channel());
 
         String encoded = null;
         try {

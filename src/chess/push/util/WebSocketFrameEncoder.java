@@ -27,7 +27,7 @@ public class WebSocketFrameEncoder extends MessageToMessageEncoder<String> {
      */
     @Override
     protected void encode(ChannelHandlerContext ctx, String msg, List<Object> out) {
-        LOG.info("[WebSocketFrameEncoder] encode {} to channel {}", msg, ctx.channel());
+        LOG.debug("[WebSocketFrameEncoder] encode {} to channel {}", msg, ctx.channel());
 
         out.add(new TextWebSocketFrame(msg));
     }

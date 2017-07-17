@@ -30,7 +30,7 @@ public class WebSocketFrameDecoder extends MessageToMessageDecoder<WebSocketFram
     protected void decode(ChannelHandlerContext ctx, WebSocketFrame frame, List<Object> out) {
         if (frame instanceof TextWebSocketFrame) {
             String decoded = ((TextWebSocketFrame) frame).text();
-            LOG.info("[WebSocketFrameDecoder] decoded {} from channel {}", decoded, ctx.channel());
+            LOG.debug("[WebSocketFrameDecoder] decoded {} from channel {}", decoded, ctx.channel());
             out.add(decoded);
         } else {
             throw new UnsupportedOperationException("Unsupported frame type [" + frame.getClass().getName() + "]");

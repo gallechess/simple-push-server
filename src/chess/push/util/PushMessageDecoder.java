@@ -27,7 +27,7 @@ public class PushMessageDecoder extends MessageToMessageDecoder<String> {
      */
     @Override
     protected void decode(ChannelHandlerContext ctx, String msg, List<Object> out) {
-        LOG.info("[PushMessageDecoder] decode {} from channel {}", msg, ctx.channel());
+        LOG.debug("[PushMessageDecoder] decode {} from channel {}", msg, ctx.channel());
 
         PushMessage decoded = null;
         try {
