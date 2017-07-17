@@ -21,12 +21,12 @@ import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.CharsetUtil;
 
-public final class TestTcpClient {
+public final class TestTcpSocketClient {
 
-    private static final String HOST = "127.0.0.1";
-    private static final int PORT = 8100;
+    private static final String CLIEND_ID = "testTcpSocketClient1";
 
-    private static final PushMessage CLIEND_ID = new PushMessage("tcpsocket.test1", "testClient1", null);
+    private static final String OUTBOUND_SERVER_HOST = "127.0.0.1";
+    private static final int OUTBOUND_SERVER_PORT = 8001;
 
     public static void main(String[] args) throws Exception {
         EventLoopGroup group = new NioEventLoopGroup();
@@ -45,7 +45,7 @@ public final class TestTcpClient {
                          }
                      });
 
-            bootstrap.connect(HOST, PORT).sync().channel().closeFuture().sync();
+            bootstrap.connect(OUTBOUND_SERVER_HOST, OUTBOUND_SERVER_PORT).sync().channel().closeFuture().sync();
 
         } finally {
             group.shutdownGracefully();
@@ -57,16 +57,16 @@ class TestClientHandler extends SimpleChannelInboundHandler<PushMessage> {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestClientHandler.class);
 
-    private final PushMessage clientId;
+    private final PushMessage clientIdMsg;
 
-    public TestClientHandler(PushMessage clientId) {
-        this.clientId = clientId;
+    public TestClientHandler(String clientId) {
+        this.clientIdMsg = new PushMessage(null, clientId, null);
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        ctx.channel().writeAndFlush(clientId);
-        LOG.info("[TestClientHandler] sent {} to {}", clientId, ctx.channel());
+        ctx.channel().writeAndFlush(clientIdMsg);
+        LOG.info("[TestClientHandler] sent {} to {}", clientIdMsg, ctx.channel());
     }
 
     @Override
