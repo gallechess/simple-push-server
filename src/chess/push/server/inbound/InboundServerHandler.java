@@ -52,7 +52,7 @@ public class InboundServerHandler extends SimpleChannelInboundHandler<PushMessag
 
         // Service ID에 해당하는 Inbound Queue에 메시지 추가
         String serviceId = msg.getServiceId();
-        if (inboundQueues.containsKey(serviceId)) {
+        if (serviceId != null && inboundQueues.containsKey(serviceId)) {
             inboundQueues.get(serviceId).enqueue(msg);
         } else {
             LOG.warn("[InboundServerHandler] invalid service id in message {}", msg);
