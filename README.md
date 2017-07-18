@@ -11,7 +11,7 @@
 * 송수신 메시지는 JSON 문자열 사용
 * 전송 대상 라우팅은 서비스ID, 그룹ID, 클라이언트ID 체계를 통해 전체, 특정 그룹, 특정 클라이언트 전송 가능
 * 논리적인 서비스 단위로 설정(통신방식, 포트, 큐 사이즈 등)을 통해 물리적인 서버 확장 가능
-* 서비스별 큐, 클라이언트별 큐를 사용하여 클라이언트 성능 차이로 인한 간섭과 메시지 유실 최소화
+* 서비스별 큐, 클라이언트별 큐를 사용하여 클라이언트 성능 차이로 인한 간섭과 메시지 유실 방지
 
 ## 기본 구조
 ![structure](./structure.png)
@@ -20,9 +20,9 @@
 ### 1. Business Application
 * Push 메시지 생성 주체
 * Inbound Server에 TCP Socket으로 연결하여 Push 메시지 송신
-  (어플리케이션 통합 구성인 경우 서비스ID로 구분된 Inbound Queue에 메시지 추가)
+  - 어플리케이션 통합 구성인 경우 서비스ID로 구분된 Inbound Queue에 메시지 추가
 * 메시지는 [PushMessage.java](./src/chess/push/common/PushMessage.java) 타입에 바인딩 가능한 JSON 문자열 사용
-  (TCP 스트림 상에서 메시지 구분자: "\r\0")
+  - TCP 스트림 상에서 메시지 구분자: "\r\0"
 
 ### 2. Inbound Server
 * 비즈니스 어플리케이션으로부터 Push할 메시지를 수신받는 서버
@@ -38,21 +38,21 @@
 ### 4. Outbound Server
 * 클라이언트의 연결을 처리하는 서버
 * 설정을 통해 TCP Socket과 WebSocket 중 선택 가능
-  (WebSocket 방식인 경우 Web Socket URI 지정 필요)
+  - WebSocket 방식인 경우 Web Socket URI 지정 필요
 * 클라이언트 연결/해제시 Outbound Queue 인스턴스 생성/제거
 * 클라이언트가 그룹ID, 클라이언트ID를 송신하면 이를 해당 채널의 속성으로 설정
-  (그룹ID/클라이언트ID는 특정 그룹/클라이언트 지정 Push를 위한 라우팅 용도)
+  - 그룹ID/클라이언트ID는 특정 그룹/클라이언트 지정 Push를 위한 라우팅 용도
 
 ### 5. Outbound Queue
 * 클라이언트가 Outbound Server에 연결시 생성되는 큐
 * Inbound Queue가 Push 메시지를 전달하는 대상
 * 별도 쓰레드를 통해 큐에 담긴 메시지를 클라이언트 채널에 전송
-  (TCP Socket 채널인 경우 메시지 구분자 "\r\0" 사용)
+  - TCP Socket 채널인 경우 메시지 구분자 "\r\0" 사용
 
 ### 6. Client
 * 최종적으로 메시지를 Push받는 대상
 * Outbound Server에 연결 후 라우팅 정보(그룹ID, 클라이언트ID) 등록
-  (등록 메시지: {"groupId":"그룹ID","clientId":"클라이언트ID"})
+  - 등록 메시지: {"groupId":"그룹ID","clientId":"클라이언트ID"}
 
 ## 사용 방법
 * 서버 실행: [Server.java](./src/chess/push/server/Server.java) 인스턴스를 생성하여 startupServer() 메소드 호출
