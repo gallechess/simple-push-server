@@ -6,12 +6,12 @@
 ## 주요 특징
 * Netty 프레임워크 기반으로 비동기 통신 사용
 * 독립적인 프로세스로 구동되어 비지니스 어플리케이션과 연동
-* 비즈니스 어플리케이션이 Java 기반인 경우 임베디드된 형태로 통합 가능
-* 클라이언트와의 통신은 TCP Socket, WebSocket 활용
+* 비즈니스 어플리케이션이 Java 기반인 경우 어플리케이션에 임베디드 형태로 통합 가능
+* 클라이언트와의 통신은 TCP Socket, WebSocket 지원
 * 송수신 메시지는 JSON 문자열 사용
-* 서비스ID 및 클라이언트ID를 사용하여 전체 클라이언트 전송 또는 특정 클라이언트만 전송 가능
-* 서비스ID 단위로 설정(통신방식, 포트, 큐 사이즈 등)을 통해 확장 가능
-* 서비스별 큐, 클라이언트별 큐를 사용하여 상호간의 간섭을 줄이고 메시지 유실 최소화
+* 전송 대상 라우팅은 서비스ID, 그룹ID, 클라이언트ID 체계를 통해 전체, 특정 그룹, 특정 클라이언트 전송 가능
+* 논리적인 서비스 단위로 설정(통신방식, 포트, 큐 사이즈 등)을 통해 물리적인 서버 확장 가능
+* 서비스별 큐, 클라이언트별 큐를 사용하여 클라이언트 성능 차이로 인한 간섭과 메시지 유실 최소화
 
 ## 기본 구조
 ![structure](./structure.png)
@@ -20,46 +20,45 @@
 ### 1. Business Application
 * Push 메시지 생성 주체
 * Inbound Server에 TCP Socket으로 연결하여 Push 메시지 송신
-* 통합 구성인 경우 서비스ID로 적절한 Inbound Queue 인스턴스를 찾아 메시지 추가
-* 메시지는 [PushMessage.java](./src/chess/push/common/PushMessage.java) 타입에 바인딩 가능한 JSON 문자열
+  (어플리케이션 통합 구성인 경우 서비스ID로 구분된 Inbound Queue에 메시지 추가)
+* 메시지는 [PushMessage.java](./src/chess/push/common/PushMessage.java) 타입에 바인딩 가능한 JSON 문자열 사용
   (TCP 스트림 상에서 메시지 구분자: "\r\0")
 
 ### 2. Inbound Server
-* 비즈니스 어플리케이션과 연동하여 Push할 메시지를 수신받는 서버
+* 비즈니스 어플리케이션으로부터 Push할 메시지를 수신받는 서버
 * 전역적으로 1개 인스턴스만 존재
-* TCP 소켓통신 사용
-* 수신 메시지에 담긴 서비스ID에 따라 적절한 InboundQueue에 메시지 추가
+* TCP Socket 통신방식 사용
+* 수신 메시지에 담긴 서비스ID에 해당하는 Inbound Queue에 메시지 추가
 
 ### 3. Inbound Queue
 * 서비스ID에 따라 하나씩 생성되는 메시지 큐
-* Inbound Server가 Push 메시지를 전달하는 대상
-* 별도 쓰레드로 동작하여 큐에 쌓인 메시지를 서비스ID와 클라이언트ID에 따라 적절한 Outbound Queue로 이동
+* Inbound Server를 통해 들어온 Push 메시지가 서비스ID를 기준으로 라우팅되어 보관
+* 별도 쓰레드를 통해 큐에 담긴 메시지를 서비스ID, 그룹ID, 클라이언트ID에 따라 적절한 Outbound Queue로 이동
 
 ### 4. Outbound Server
 * 클라이언트의 연결을 처리하는 서버
 * 설정을 통해 TCP Socket과 WebSocket 중 선택 가능
   (WebSocket 방식인 경우 Web Socket URI 지정 필요)
 * 클라이언트 연결/해제시 Outbound Queue 인스턴스 생성/제거
-* 클라이언트가 클라이언트ID 송신시 이를 채널 속성으로 설정
-  (클라이언트ID는 클라이언트 지정 Push를 위한 구분용)
+* 클라이언트가 그룹ID, 클라이언트ID를 송신하면 이를 해당 채널의 속성으로 설정
+  (그룹ID/클라이언트ID는 특정 그룹/클라이언트 지정 Push를 위한 라우팅 용도)
 
 ### 5. Outbound Queue
 * 클라이언트가 Outbound Server에 연결시 생성되는 큐
 * Inbound Queue가 Push 메시지를 전달하는 대상
-* 별도 쓰레드로 동작하여 큐에 쌓인 메시지를 클라이언트 채널에 전송
-* TCP Socket 연결인 경우 메시지 구분자 "\r\0" 사용
+* 별도 쓰레드를 통해 큐에 담긴 메시지를 클라이언트 채널에 전송
+  (TCP Socket 채널인 경우 메시지 구분자 "\r\0" 사용)
 
 ### 6. Client
-* Push 메시지를 수신받는 대상
-* 사전에 Outbound Server의 주소 정보 인지 필요
-* Outbound Server에 연결 후 클라이언트ID를 전송 가능
-  (클라이언트ID 전송 메시지: {"clientId":"본인ID"})
+* 최종적으로 메시지를 Push받는 대상
+* Outbound Server에 연결 후 라우팅 정보(그룹ID, 클라이언트ID) 등록
+  (등록 메시지: {"groupId":"그룹ID","clientId":"클라이언트ID"})
 
 ## 사용 방법
 * 서버 실행: [Server.java](./src/chess/push/server/Server.java) 인스턴스를 생성하여 startupServer() 메소드 호출
 * 테스트 서버 실행: [TestServerMain.java](./test/chess/push/server/TestServerMain.java) 참고
 * 서버 및 서비스 설정: Spring Framework를 사용할 경우 [application.xml](./testResource/application.xml) 참고
-```
+```xml
 <!-- 기본 속성 설정 -->
 <bean id="baseProperty" class="chess.push.server.property.PushBaseProperty">
     <!-- Inbound Server listen port -->
