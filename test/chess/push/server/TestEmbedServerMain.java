@@ -28,10 +28,10 @@ public class TestEmbedServerMain {
             // Push 서버 모듈 기동
             Map<String, InboundQueue> inboundQueues = server.startupServer(true, baseProperty, serviceProperties);
 
-            // 각 서비스ID에 지속적으로 1초 단위 테스트 메시지 송신
+            // 모든 서비스ID의 전체 클라이언트에 대해 지속적으로 1초 단위 테스트 메시지 송신
             for (;;) {
                 inboundQueues.forEach((serviceId, inboundQueue) -> {
-                    inboundQueue.enqueue(new PushMessage(serviceId, null, "test message [" + System.currentTimeMillis() + "]"));
+                    inboundQueue.enqueue(new PushMessage(serviceId, null, null, "test message [" + System.currentTimeMillis() + "]"));
                 });
                 TimeUnit.SECONDS.sleep(1L);
             }

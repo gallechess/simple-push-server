@@ -23,11 +23,13 @@ import io.netty.util.CharsetUtil;
 
 public final class TestTcpSocketClient {
 
+    private static final String GROUP_ID = "testGroup1";
     private static final String CLIEND_ID = "testTcpSocketClient1";
     private static final String DEFAULT_OUTBOUND_SERVER_HOST = "127.0.0.1";
     private static final int DEFAULT_OUTBOUND_SERVER_PORT = 8001;
 
     public static void main(String[] args) throws Exception {
+        String groupId = System.getProperty("groupId", GROUP_ID);
         String clientId = System.getProperty("clientId", CLIEND_ID);
         String outboundServerHost = System.getProperty("inboundServerHost", DEFAULT_OUTBOUND_SERVER_HOST);
         int outboundServerPort = Integer.parseInt(System.getProperty("inboundServerPort", String.valueOf(DEFAULT_OUTBOUND_SERVER_PORT)));
@@ -44,7 +46,7 @@ public final class TestTcpSocketClient {
                              pipeline.addLast(new DelimiterBasedFrameDecoder(Integer.MAX_VALUE, PushConstant.DEFAULT_DELIMITER));
                              pipeline.addLast(new StringDecoder(CharsetUtil.UTF_8), new StringEncoder(CharsetUtil.UTF_8));
                              pipeline.addLast(new PushMessageDecoder(), new PushMessageEncoder(PushConstant.DEFAULT_DELIMITER_STR));
-                             pipeline.addLast(new TestClientHandler(clientId));
+                             pipeline.addLast(new TestClientHandler(groupId, clientId));
                          }
                      });
 
@@ -62,8 +64,8 @@ class TestClientHandler extends SimpleChannelInboundHandler<PushMessage> {
 
     private final PushMessage clientIdMsg;
 
-    public TestClientHandler(String clientId) {
-        this.clientIdMsg = new PushMessage(null, clientId, null);
+    public TestClientHandler(String groupId, String clientId) {
+        this.clientIdMsg = new PushMessage(null, groupId, clientId, null);
     }
 
     @Override

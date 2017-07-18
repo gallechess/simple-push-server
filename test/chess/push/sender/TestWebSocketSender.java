@@ -1,4 +1,4 @@
-package chess.push.client;
+package chess.push.sender;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,12 +20,12 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.CharsetUtil;
 
-public final class TestSender {
+public final class TestWebSocketSender {
 
-//    private static final String TEST_SERVICE_ID = "test1.tcpsocket";
     private static final String TEST_SERVICE_ID = "test2.websocket";
+    private static final String TEST_GROUP_ID = null;
+//    private static final String TEST_GROUP_ID = "testGroup1";
     private static final String TEST_CLIENT_ID = null;
-//    private static final String TEST_CLIENT_ID = "testTcpSocketClient1";
 //    private static final String TEST_CLIENT_ID = "testWebSocketClient1";
     private static final int TEST_COUNT = 1000;
     private static final String DEFAULT_INBOUND_SERVER_HOST = "127.0.0.1";
@@ -33,6 +33,7 @@ public final class TestSender {
 
     public static void main(String[] args) throws Exception {
         String testServiceId = System.getProperty("testServiceId", TEST_SERVICE_ID);
+        String testGroupId = System.getProperty("testGroupId", TEST_GROUP_ID);
         String testClientId = System.getProperty("testClientId", TEST_CLIENT_ID);
         int testCount = Integer.parseInt(System.getProperty("testCount", String.valueOf(TEST_COUNT)));
 
@@ -50,7 +51,7 @@ public final class TestSender {
                              ChannelPipeline pipeline = ch.pipeline();
                              pipeline.addLast(new StringEncoder(CharsetUtil.UTF_8));
                              pipeline.addLast(new PushMessageEncoder(PushConstant.DEFAULT_DELIMITER_STR));
-                             pipeline.addLast(new TestSenderHandler());
+                             pipeline.addLast(new TestWebSocketSenderHandler());
                          }
                      });
 
@@ -60,7 +61,7 @@ public final class TestSender {
                 @Override
                 public void operationComplete(ChannelFuture future) throws Exception {
                     for (int cnt = 1; cnt <= testCount; cnt++) {
-                        PushMessage message = new PushMessage(testServiceId, testClientId, "test message [" + cnt + "]");
+                        PushMessage message = new PushMessage(testServiceId, testGroupId, testClientId, "WebSocket test message [" + cnt + "]");
                         future.channel().writeAndFlush(message);
                         Thread.sleep(10L);
                     }
@@ -73,9 +74,9 @@ public final class TestSender {
     }
 }
 
-class TestSenderHandler extends SimpleChannelInboundHandler<PushMessage> {
+class TestWebSocketSenderHandler extends SimpleChannelInboundHandler<PushMessage> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TestSenderHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TestWebSocketSenderHandler.class);
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, PushMessage msg) throws Exception {
@@ -84,7 +85,7 @@ class TestSenderHandler extends SimpleChannelInboundHandler<PushMessage> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        LOG.error("[TestSenderHandler] error " + ctx.channel() + ", it will be closed", cause);
+        LOG.error("[TestWebSocketSenderHandler] error " + ctx.channel() + ", it will be closed", cause);
         ctx.close();
     }
 

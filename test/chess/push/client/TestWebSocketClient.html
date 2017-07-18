@@ -15,18 +15,22 @@
                     alert("input ip/port/uri");
                     return false;
                 }
-                var webSocketUrl = "ws://" + ip + ":" + port + "/" + uri;
+
+                var groupId = document.getElementById("groupId").value;
+                if (!groupId) {
+                    groupId = null;
+                }
                 var clientId = document.getElementById("clientId").value;
                 if (!clientId) {
                     clientId = null;
                 }
 
-                socket = new WebSocket(webSocketUrl);
+                socket = new WebSocket("ws://" + ip + ":" + port + "/" + uri);
                 socket.onopen = function() {
                     log("WebSocket opend");
                     if (clientId) {
-                        socket.send(JSON.stringify({clientId:clientId}));
-                        log("sent client id [" + clientId + "]");
+                        socket.send(JSON.stringify({groupId:groupId,clientId:clientId}));
+                        log("sent group id [" + groupId + "] and client id [" + clientId + "]");
                     }
                 };
                 socket.onmessage = function(e) {
@@ -62,14 +66,18 @@
     </head>
     <body>
         <h2>[simple-push-server] Test WebSocket Client</h2>
-        <table border="1" cellspacing="0" cellpadding="5">
+        <table border="1" style="border-collapse:collapse;">
             <tbody>
                 <tr>
-                    <td>WebSocket URL</td>
+                    <th>WebSocket URL</th>
                     <td>ws://<input type="text" id="ip" value="127.0.0.1" size="10" />:<input type="text" id="port" value="8002" size="3" />/<input type="text" id="uri" value="test2" size="10" /></td>
                 </tr>
                 <tr>
-                    <td>Client ID</td>
+                    <th>Group ID</th>
+                    <td><input type="text" id="groupId" value="testGroup1" /></td>
+                </tr>
+                <tr>
+                    <th>Client ID</th>
                     <td><input type="text" id="clientId" value="testWebSocketClient1" /></td>
                 </tr>
             </tbody>

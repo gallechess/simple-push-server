@@ -20,7 +20,7 @@ public class OutboundQueue extends Thread {
 
     private String serviceId;					// Push Service ID
     private BlockingQueue<PushMessage> queue;	// message queue
-    private final int capacity;					// message queue capacity
+    private final int capacity;				// message queue capacity
     private Channel channel;					// Client Channel instance
 
     /**
@@ -37,6 +37,15 @@ public class OutboundQueue extends Thread {
     }
 
     /**
+     * 큐와 연관된 클라이언트 채널의 그룹ID를 반환한다.
+     * @return 클라이언트 채널 속성 중 그룹ID
+     */
+    public String groupId() {
+        // 그룹ID는 런타임에 변경될 수 있으므로 항상 채널에서 조회 필요
+        return channel.attr(PushConstant.GROUP_ID).get();
+    }
+
+    /**
      * 큐와 연관된 클라이언트 채널의 클라이언트ID를 반환한다.
      * @return 클라이언트 채널 속성 중 클라이언트ID
      */
@@ -47,22 +56,39 @@ public class OutboundQueue extends Thread {
 
     /**
      * 큐에 메시지를 추가한다.
-     * @param message Push 메시지
+     * @param pushMessage Push 메시지
      */
-    public void enqueue(PushMessage message) {
-        if (message == null
-                || !serviceId.equals(message.getServiceId())
-                || (message.getClientId() != null && !message.getClientId().equals(clientId()))) {
-            LOG.error("[OutboundQueue:{}] [{}] invalid message {}", serviceId, clientId(), message);
+    public void enqueue(PushMessage pushMessage) {
+        if (!isValid(pushMessage)) {
+            LOG.error("[OutboundQueue:{}] [{}] [{}] invalid message {}", serviceId, groupId(), clientId(), pushMessage);
             return;
         }
 
-        boolean result = queue.offer(message);
-        if (result) {
-            LOG.info("[OutboundQueue:{}] [{}] enqueued {}", serviceId, clientId(), message);
-        } else {
-            LOG.error("[OutboundQueue:{}] [{}] failed to enqueue {}", serviceId, clientId(), message);
+        if (!queue.offer(pushMessage)) {
+            LOG.error("[OutboundQueue:{}] [{}] [{}] failed to enqueue {}", serviceId, groupId(), clientId(), pushMessage);
         }
+    }
+
+    private boolean isValid(PushMessage pushMessage) {
+        if (pushMessage == null) {
+            return false;
+        }
+
+        String msgServiceId = pushMessage.getServiceId();
+        String msgGroupId = pushMessage.getGroupId();
+        String msgClientId = pushMessage.getClientId();
+
+        if (msgServiceId == null || !msgServiceId.equals(serviceId)) {
+            return false;
+        }
+        if (msgGroupId != null && !msgGroupId.equals(groupId())) {
+            return false;
+        }
+        if (msgClientId != null && !msgClientId.equals(clientId())) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -70,7 +96,7 @@ public class OutboundQueue extends Thread {
      * @return 큐 상태 문자열
      */
     public String status() {
-        return "clientId: " + clientId() + ", channel: " + channel + ", capacity: " + capacity + ", current: " + queue.size();
+        return "groupId: " + groupId() + ", clientId: " + clientId() + ", channel: " + channel + ", capacity: " + capacity + ", current: " + queue.size();
     }
 
     /**
@@ -88,13 +114,13 @@ public class OutboundQueue extends Thread {
     public void run() {
         setName("OutboundQueueThread:" + serviceId);
 
-        LOG.info("[{}] [{}] started", getName(), clientId());
+        LOG.info("[{}] [{}] [{}] started", getName(), groupId(), clientId());
 
         PushMessage message = null;
         while (!isInterrupted()) {
             try {
                 message = queue.take();
-                LOG.info("[{}] [{}] take {}", getName(), clientId(), message);
+                LOG.info("[{}] [{}] [{}] take {}", getName(), groupId(), clientId(), message);
             } catch (InterruptedException e) {
                 break;
             }
@@ -105,7 +131,7 @@ public class OutboundQueue extends Thread {
             }
         }
 
-        LOG.info("[{}] [{}] shutdown", getName(), clientId());
+        LOG.info("[{}] [{}] [{}] shutdown", getName(), groupId(), clientId());
     }
 
 }

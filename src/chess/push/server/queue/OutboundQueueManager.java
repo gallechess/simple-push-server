@@ -75,24 +75,37 @@ public class OutboundQueueManager {
     }
 
     /**
-     * Push 메시지의 서비스ID와 클라이언트ID에 따라 해당 OutboundQueue에 추가한다.<br>
-     * -Push 메시지의 클라이언트ID가 null이면 서비스ID에 해당하는 모든 OutboundQueue에 추가
-     * @param message Push 메시지
+     * Push 메시지의 서비스ID, 그룹ID, 클라이언트ID에 따라 해당하는 OutboundQueue에 메시지를 추가한다.<br>
+     * -클라이언트ID가 null이 아닌 경우, 해당 클라이언트ID를 갖는 채널의 OutboundQueue에 메시지 추가<br>
+     * -클라이언트ID가 null이고 그룹ID가 null이 아닌 경우, 해당 그룹ID를 갖는 모든 채널의 OutboundQueue에 메시지 추가<br>
+     * -클라이언트ID와 그룹ID가 모두 null인 경우, 해당 서비스ID를 갖는 모든 채널의 OutboundQueue에 메시지 추가<br>
+     * @param pushMessage Push 메시지
      */
-    public void transfer(PushMessage message) {
-        String serviceId = message.getServiceId();
-        if (outboundQueueGroups.containsKey(serviceId)) {
-            Map<ChannelId, OutboundQueue> queueGroup = outboundQueueGroups.get(serviceId);
-            String clientId = message.getClientId();
-            if (clientId == null) {
-                queueGroup.forEach((channelId, queue) -> {
-                    queue.enqueue(message);
-                });
+    public void transfer(PushMessage pushMessage) {
+        String serviceId = pushMessage.getServiceId();
+        if (!outboundQueueGroups.containsKey(serviceId)) {
+            return;
+        }
+
+        Map<ChannelId, OutboundQueue> queueGroup = outboundQueueGroups.get(serviceId);
+        String clientId = pushMessage.getClientId();
+        if (clientId != null) {
+            queueGroup.forEach((channelId, queue) -> {
+                if (clientId.equals(queue.clientId())) {
+                    queue.enqueue(pushMessage);
+                }
+            });
+        } else {
+            String groupId = pushMessage.getGroupId();
+            if (groupId != null) {
+                 queueGroup.forEach((channelId, queue) -> {
+                     if (groupId.equals(queue.groupId())) {
+                         queue.enqueue(pushMessage);
+                     }
+                 });
             } else {
                 queueGroup.forEach((channelId, queue) -> {
-                    if (clientId.equals(queue.clientId())) {
-                        queue.enqueue(message);
-                    }
+                    queue.enqueue(pushMessage);
                 });
             }
         }

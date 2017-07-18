@@ -48,7 +48,7 @@ public class OutboundServerHandler extends SimpleChannelInboundHandler<PushMessa
 
     /**
      * 클라이언트로부터 메시지 수신했을 때 동작<br>
-     * -클라이언트로부터의 메시지는 ID 전송으로 간주하여 채널에 클라이언트ID 설정
+     * -클라이언트로부터의 메시지는 ID 전송으로 간주하여 채널에 그룹ID, 클라이언트ID 설정
      * @param ctx ChannelHandlerContext object
      * @param msg 수신 메시지
      * @see io.netty.channel.SimpleChannelInboundHandler#channelRead0(io.netty.channel.ChannelHandlerContext, java.lang.Object)
@@ -57,10 +57,16 @@ public class OutboundServerHandler extends SimpleChannelInboundHandler<PushMessa
     protected void channelRead0(ChannelHandlerContext ctx, PushMessage msg) {
         LOG.info("[OutboundServerHandler:{}] received {} from {}", property.getServiceId(), msg, ctx.channel());
 
+        String groupId = msg.getGroupId();
+        if (groupId != null) {
+            ctx.channel().attr(PushConstant.GROUP_ID).set(groupId);
+            LOG.info("[OutboundServerHandler:{}] set group id [{}] to {}", property.getServiceId(), groupId, ctx.channel());
+        }
+
         String clientId = msg.getClientId();
         if (clientId != null) {
             ctx.channel().attr(PushConstant.CLIENT_ID).set(clientId);
-            LOG.info("[OutboundServerHandler:{}] set client id [{}] to {}", clientId, ctx.channel());
+            LOG.info("[OutboundServerHandler:{}] set client id [{}] to {}", property.getServiceId(), clientId, ctx.channel());
         }
     }
 
