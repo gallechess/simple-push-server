@@ -9,8 +9,6 @@ import chess.push.common.PushConstant;
 import chess.push.common.PushMessageDecoder;
 import chess.push.server.queue.InboundQueue;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
@@ -35,8 +33,7 @@ public class InboundServer {
     private final int port;		// Inbound Server listen port
 
     private EventLoopGroup bossGroup;		// EventLoopGroup that accepts an incoming connection
-    private EventLoopGroup workerGroup;		// EventLoopGroup that handles the traffic of the accepted connection
-    private ChannelFuture channelFuture;	// Inbound Server channel asynchronous bind result
+    private EventLoopGroup workerGroup;	// EventLoopGroup that handles the traffic of the accepted connection
 
     /**
      * constructor with a paramter
@@ -77,7 +74,7 @@ public class InboundServer {
                      .childOption(ChannelOption.SO_KEEPALIVE, true)
                      .childOption(ChannelOption.TCP_NODELAY, true);
 
-            channelFuture = bootstrap.bind(port).sync();
+            bootstrap.bind(port).sync();
 
             LOG.info("[InboundServer] started, listening on port " + port);
 
@@ -89,27 +86,18 @@ public class InboundServer {
 
     /**
      * InboundServer 인스턴스를 중지한다.<br>
-     * -close Inbound Server channel<br>
      * -shutdown worker EventLoopGroup<br>
      * -shutdown boss EventLoopGroup
      */
     public void shutdown() {
-        if (channelFuture != null) {
-            Channel channel = channelFuture.channel();
-            if (channel != null) {
-                try {
-                    channel.closeFuture().sync();
-                } catch (InterruptedException e) {
-                    LOG.error("[InboundServer] interrupted during closing channel", e);
-                }
-            }
-        }
         if (workerGroup != null) {
             workerGroup.shutdownGracefully();
         }
         if (bossGroup != null) {
             bossGroup.shutdownGracefully();
         }
+
+        LOG.info("[InboundServer] shutdown");
     }
 
 }

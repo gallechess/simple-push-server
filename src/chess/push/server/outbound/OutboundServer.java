@@ -5,8 +5,6 @@ import org.slf4j.LoggerFactory;
 
 import chess.push.server.property.PushServiceProperty;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
@@ -27,8 +25,7 @@ public abstract class OutboundServer {
     private final PushServiceProperty property;	// Push Service property
 
     private EventLoopGroup bossGroup;		// EventLoopGroup that accepts an incoming connection
-    private EventLoopGroup workerGroup;		// EventLoopGroup that handles the traffic of the accepted connection
-    private ChannelFuture channelFuture;	// Outbound Server channel asynchronous bind result
+    private EventLoopGroup workerGroup;	// EventLoopGroup that handles the traffic of the accepted connection
 
     /**
      * constructor with a parameter
@@ -58,7 +55,7 @@ public abstract class OutboundServer {
                      .childOption(ChannelOption.SO_KEEPALIVE, true)
                      .childOption(ChannelOption.TCP_NODELAY, true);
 
-            channelFuture = bootstrap.bind(property.getOutboundServerPort()).sync();
+            bootstrap.bind(property.getOutboundServerPort()).sync();
 
             LOG.info("[OutboundServer:{}] started, listening on port {}", property.getServiceId(), property.getOutboundServerPort());
 
@@ -70,27 +67,18 @@ public abstract class OutboundServer {
 
     /**
      * OutboundServer 인스턴스를 중지한다.<br>
-     * -close Outbound Server channel<br>
      * -shutdown worker EventLoopGroup<br>
      * -shutdown boss EventLoopGroup
      */
     public void shutdown() {
-        if (channelFuture != null) {
-            Channel channel = channelFuture.channel();
-            if (channel != null) {
-                try {
-                    channel.closeFuture().sync();
-                } catch (InterruptedException e) {
-                    LOG.error("[OutboundServer:" + property.getServiceId() + "] interrupted during closing channel " + channel, e);
-                }
-            }
-        }
         if (workerGroup != null) {
             workerGroup.shutdownGracefully();
         }
         if (bossGroup != null) {
             bossGroup.shutdownGracefully();
         }
+
+        LOG.info("[OutboundServer:{}] shutdown", property.getServiceId());
     }
 
     /**
